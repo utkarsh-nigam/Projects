@@ -1,15 +1,13 @@
 import sys,os
 #os.chdir("/Users/utkarshvirendranigam/Desktop/Homework/Project")
-required_packages=["PyQt5","scipy","itertools","random","matplotlib","pandas","numpy","sklearn","pydotplus","collections","warnings","seaborn"]
-'''
+required_packages=["PyQt5","scipy","itertools","random","matplotlib","pandas","numpy","sklearn","graphviz","pydotplus","collections","warnings","seaborn"]
+
 for my_package in required_packages:
     try:
         command_string="conda install "+ my_package+ " --yes"
         os.system(command_string)
     except:
         count=1
-'''
-
 
 from PyQt5.QtWidgets import (QMainWindow, QApplication, QWidget, QPushButton, QAction, QComboBox, QLabel,
                              QGridLayout, QCheckBox, QGroupBox, QVBoxLayout, QHBoxLayout, QLineEdit, QPlainTextEdit)
