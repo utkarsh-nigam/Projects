@@ -4,7 +4,7 @@ required_packages=["PyQt5","scipy","itertools","random","matplotlib","pandas","n
 for my_package in required_packages:
     try:
         command_string="conda install "+ my_package+ " --yes"
-        #os.system(command_string)
+        os.system(command_string)
     except:
         count=1
 
@@ -414,11 +414,13 @@ class VariableRelation(QMainWindow):
         self.fig.canvas.draw_idle()
 
 
-
 class AttritionRelation(QMainWindow):
     #::---------------------------------------------------------
-    # This class creates a canvas with a plot to show the
-    # distribution of continuous features in the dataset
+    # This class creates a canvas with a plot to compare the
+    # variables between Attrition:Yes and Attrition:No
+    # For continuous variables, it shows the Minimum, Median,
+    # Mean and Maximum Values. For categorical variables,
+    # it shows the count of values for each distinct element.
     #::---------------------------------------------------------
     send_fig = pyqtSignal(str)
 
@@ -439,7 +441,6 @@ class AttritionRelation(QMainWindow):
         self.axes2 = [self.ax2]
         self.canvas = FigureCanvas(self.fig)
 
-
         self.canvas.setSizePolicy(QSizePolicy.Expanding,QSizePolicy.Expanding)
 
         self.canvas.updateGeometry()
@@ -457,16 +458,13 @@ class AttritionRelation(QMainWindow):
         self.groupBox1 = QGroupBox('Relation between Attrition: Yes and No')
         self.groupBox1Layout = QVBoxLayout()
         self.groupBox1.setLayout(self.groupBox1Layout)
-        #self.groupBox2.setMinimumSize(400, 50)
         self.groupBox1Layout.addWidget(self.canvas)
 
         self.groupBox2 = QGroupBox('Summary')
         self.groupBox2Layout = QVBoxLayout()
         self.groupBox2.setLayout(self.groupBox2Layout)
-        # self.groupBox2.setMinimumSize(400, 50)
         self.graph_summary = QPlainTextEdit()
         self.groupBox2Layout.addWidget(self.graph_summary)
-
 
         self.layout = QGridLayout(self.main_widget)
         self.layout.addWidget(QLabel("Select Feature Category:"),0,0,1,1)
@@ -474,13 +472,8 @@ class AttritionRelation(QMainWindow):
         self.layout.addWidget(QLabel(""), 0, 2, 1, 1)
         self.layout.addWidget(QLabel("Select Features:"),0,3,1,1)
         self.layout.addWidget(self.dropdown2,0,4,1,1)
-        #self.layout.addWidget(QLabel(""), 0, 5, 1, 1)
         self.layout.addWidget(self.btnCreateGraph, 1, 0, 1, 5)
-        #self.layout.addWidget(QLabel("Choose Data Filter:"), 0, 6, 1, 1)
-        #self.layout.addWidget(self.filter_data,0,7,1,2)
         self.layout.addWidget(self.groupBox1,2,0,6,5)
-        #self.layout.addWidget(QLabel(""), 1, 5, 5, 1)
-        #self.layout.addWidget(self.groupBox2, 1, 6, 5, 3)
 
         self.setCentralWidget(self.main_widget)
         self.resize(1200, 700)
@@ -500,10 +493,7 @@ class AttritionRelation(QMainWindow):
             self.featuresList = satisfaction_features
         self.dropdown2.addItems(self.featuresList)
 
-
-
     def update(self):
-
         colors=["b", "r", "g", "y", "k", "c"]
         self.ax1.clear()
         self.ax2.clear()
@@ -516,8 +506,7 @@ class AttritionRelation(QMainWindow):
             self.filtered_data["Count"]=1
             self.filtered_data[graph_feature1]=self.filtered_data[graph_feature1].astype(str)
             category_values=self.filtered_data[graph_feature1].unique().tolist()
-            #for item in temp_values:
-                #category_values.append(str(item))
+
             yes_data=self.filtered_data[self.filtered_data["Attrition"]=="Yes"]
             no_data=self.filtered_data[self.filtered_data["Attrition"]=="No"]
 
@@ -562,18 +551,13 @@ class AttritionRelation(QMainWindow):
         self.ax2.barh(category_values, val2, color='blue', height=0.3)
         self.ax2.set_title("Attrition: No")
         self.ax2.axis('off')
-        #self.ax2.set_xlabel(cat1)
-        #self.ax2.set_ylabel("Count")
         self.ax2.grid(False)
 
         left1, right1 = self.ax1.get_xlim()
         left2, right2 = self.ax2.get_xlim()
-        #print(left1, right1)
-        #print(left2, right2)
 
         if (-left1 > right2):
             graph_x_limit = left1 - 30
-
         else:
             graph_x_limit = -right2 - 30
 
@@ -581,35 +565,29 @@ class AttritionRelation(QMainWindow):
         self.ax2.set_xlim(0, -graph_x_limit)
         left1, right1 = self.ax1.get_xlim()
         left2, right2 = self.ax2.get_xlim()
-        #print(left1, right1)
-        #print(left2, right2)
 
         perc_move=(graph_x_limit)*(0.05)
         if (perc_move>-10):
             perc_move=-10
 
         for index1, value1 in enumerate(val1):
-
             self.ax1.text(value1 , index1, str(-1*(value1)), color='white')
             self.ax1.text(graph_x_limit, index1, str(category_values[index1]), fontweight='bold', horizontalalignment='left', fontsize=10)
 
-
         for index2, value2 in enumerate(val2):
             self.ax2.text(value2, index2, str(value2))
-
 
         self.fig.tight_layout()
         self.fig.canvas.draw_idle()
 
 
-
 class RandomForest(QMainWindow):
     #::--------------------------------------------------------------------------------
-    # Implementation of Random Forest Classifier using the happiness dataset
+    # Random Forest Classifier using the attrition dataset
     # the methods in this class are
     #       _init_ : initialize the class
     #       initUi : creates the canvas and all the elements in the canvas
-    #       update : populates the elements of the canvas base on the parametes
+    #       update : populates the elements of the canvas base on the parameters
     #               chosen by the user
     #::---------------------------------------------------------------------------------
     send_fig = pyqtSignal(str)
@@ -620,13 +598,6 @@ class RandomForest(QMainWindow):
         self.initUi()
 
     def initUi(self):
-        #::-----------------------------------------------------------------
-        #  Create the canvas and all the element to create a dashboard with
-        #  all the necessary elements to present the results from the algorithm
-        #  The canvas is divided using a  grid loyout to facilitate the drawing
-        #  of the elements
-        #::-----------------------------------------------------------------
-
         self.setWindowTitle(self.Title)
         self.setStyleSheet(font_size_window)
 
@@ -635,10 +606,9 @@ class RandomForest(QMainWindow):
         self.layout = QGridLayout(self.main_widget)
 
         self.groupBox1 = QGroupBox('Random Forest Features')
-        self.groupBox1Layout= QGridLayout()   # Grid
+        self.groupBox1Layout= QGridLayout()
         self.groupBox1.setLayout(self.groupBox1Layout)
 
-        # We create a checkbox of each Features
         self.feature0 = QCheckBox(features_list[0],self)
         self.feature1 = QCheckBox(features_list[1],self)
         self.feature2 = QCheckBox(features_list[2], self)
@@ -759,15 +729,9 @@ class RandomForest(QMainWindow):
         self.lblResults = QLabel('Results:')
         self.lblResults.adjustSize()
         self.txtResults = QPlainTextEdit()
-        #self.txtResults.setMinimumSize(200,100)
-        #self.lblAccuracy = QLabel('Accuracy:')
-        #self.txtAccuracy = QLineEdit()
 
         self.groupBox2Layout.addWidget(self.lblResults)
         self.groupBox2Layout.addWidget(self.txtResults)
-        #self.groupBox2Layout.addWidget(self.lblAccuracy)
-        #self.groupBox2Layout.addWidget(self.txtAccuracy)
-
 
         self.groupBox3 = QGroupBox('Summary and Comparison')
         self.groupBox3Layout = QVBoxLayout()
@@ -776,8 +740,7 @@ class RandomForest(QMainWindow):
         self.lbl_current_model_summary = QLabel('Summary:')
         self.current_model_summary = QWidget(self)
         self.current_model_summary.layout = QFormLayout(self.current_model_summary)
-        # self.other_modelsLayout = QFormLayout()
-        # self.other_models.setLayout(self.other_modelsLayout)
+
         self.txtCurrentAccuracy = QLineEdit()
         self.txtCurrentPrecision = QLineEdit()
         self.txtCurrentRecall = QLineEdit()
@@ -789,8 +752,7 @@ class RandomForest(QMainWindow):
         self.lbl_other_models = QLabel('Other Models Accuracy:')
         self.other_models = QWidget(self)
         self.other_models.layout = QFormLayout(self.other_models)
-        #self.other_modelsLayout = QFormLayout()
-        #self.other_models.setLayout(self.other_modelsLayout)
+
         self.txtAccuracy_lr = QLineEdit()
         self.txtAccuracy_knn = QLineEdit()
         self.txtAccuracy_dt = QLineEdit()
@@ -823,7 +785,7 @@ class RandomForest(QMainWindow):
         self.groupBoxG1Layout.addWidget(self.canvas)
 
         #::---------------------------------------
-        # Graphic 2 : ROC Curve
+        # Graphic 2 : AUC Score Vs Number of Trees
         #::---------------------------------------
 
         self.fig2 = Figure()
@@ -860,7 +822,7 @@ class RandomForest(QMainWindow):
         self.groupBoxG3Layout.addWidget(self.canvas3)
 
         #::--------------------------------------------
-        # Graphic 4 : ROC Curve by class
+        # Graphic 4 : ROC Curve by Class
         #::--------------------------------------------
 
         self.fig4 = Figure()
@@ -894,76 +856,66 @@ class RandomForest(QMainWindow):
         self.show()
 
     def update(self):
-        '''
-        Random Forest Classifier
-        We pupulate the dashboard using the parametres chosen by the user
-        The parameters are processed to execute in the skit-learn Random Forest algorithm
-          then the results are presented in graphics and reports in the canvas
-        :return:None
-        '''
-
-        # processing the parameters
-
         self.list_corr_features = pd.DataFrame([])
         if self.feature0.isChecked():
-            if len(self.list_corr_features)==0:
+            if len(self.list_corr_features) == 0:
                 self.list_corr_features = attr_data[features_list[0]]
             else:
-                self.list_corr_features = pd.concat([self.list_corr_features, attr_data[features_list[0]]],axis=1)
+                self.list_corr_features = pd.concat([self.list_corr_features, attr_data[features_list[0]]], axis=1)
 
         if self.feature1.isChecked():
             if len(self.list_corr_features) == 0:
                 self.list_corr_features = attr_data[features_list[1]]
             else:
-                self.list_corr_features = pd.concat([self.list_corr_features, attr_data[features_list[1]]],axis=1)
+                self.list_corr_features = pd.concat([self.list_corr_features, attr_data[features_list[1]]], axis=1)
 
         if self.feature2.isChecked():
             if len(self.list_corr_features) == 0:
                 self.list_corr_features = attr_data[features_list[2]]
             else:
-                self.list_corr_features = pd.concat([self.list_corr_features, attr_data[features_list[2]]],axis=1)
+                self.list_corr_features = pd.concat([self.list_corr_features, attr_data[features_list[2]]], axis=1)
 
         if self.feature3.isChecked():
             if len(self.list_corr_features) == 0:
                 self.list_corr_features = attr_data[features_list[3]]
             else:
-                self.list_corr_features = pd.concat([self.list_corr_features, attr_data[features_list[3]]],axis=1)
+                self.list_corr_features = pd.concat([self.list_corr_features, attr_data[features_list[3]]], axis=1)
 
         if self.feature4.isChecked():
             if len(self.list_corr_features) == 0:
                 self.list_corr_features = attr_data[features_list[4]]
             else:
-                self.list_corr_features = pd.concat([self.list_corr_features, attr_data[features_list[4]]],axis=1)
+                self.list_corr_features = pd.concat([self.list_corr_features, attr_data[features_list[4]]], axis=1)
 
         if self.feature5.isChecked():
             if len(self.list_corr_features) == 0:
                 self.list_corr_features = attr_data[features_list[5]]
             else:
-                self.list_corr_features = pd.concat([self.list_corr_features, attr_data[features_list[5]]],axis=1)
+                self.list_corr_features = pd.concat([self.list_corr_features, attr_data[features_list[5]]], axis=1)
 
         if self.feature6.isChecked():
             if len(self.list_corr_features) == 0:
                 self.list_corr_features = attr_data[features_list[6]]
             else:
-                self.list_corr_features = pd.concat([self.list_corr_features, attr_data[features_list[6]]],axis=1)
+                self.list_corr_features = pd.concat([self.list_corr_features, attr_data[features_list[6]]], axis=1)
 
         if self.feature7.isChecked():
             if len(self.list_corr_features) == 0:
                 self.list_corr_features = attr_data[features_list[7]]
             else:
-                self.list_corr_features = pd.concat([self.list_corr_features, attr_data[features_list[7]]],axis=1)
+                self.list_corr_features = pd.concat([self.list_corr_features, attr_data[features_list[7]]], axis=1)
 
         if self.feature8.isChecked():
             if len(self.list_corr_features) == 0:
                 self.list_corr_features = attr_data[features_list[8]]
             else:
-                self.list_corr_features = pd.concat([self.list_corr_features, attr_data[features_list[8]]],axis=1)
+                self.list_corr_features = pd.concat([self.list_corr_features, attr_data[features_list[8]]], axis=1)
 
         if self.feature9.isChecked():
             if len(self.list_corr_features) == 0:
                 self.list_corr_features = attr_data[features_list[9]]
             else:
-                self.list_corr_features = pd.concat([self.list_corr_features, attr_data[features_list[9]]],axis=1)
+                self.list_corr_features = pd.concat([self.list_corr_features, attr_data[features_list[9]]], axis=1)
 
         if self.feature10.isChecked():
             if len(self.list_corr_features) == 0:
@@ -1025,6 +977,65 @@ class RandomForest(QMainWindow):
             else:
                 self.list_corr_features = pd.concat([self.list_corr_features, attr_data[features_list[19]]], axis=1)
 
+        if self.feature20.isChecked():
+            if len(self.list_corr_features) == 0:
+                self.list_corr_features = attr_data[features_list[20]]
+            else:
+                self.list_corr_features = pd.concat([self.list_corr_features, attr_data[features_list[20]]], axis=1)
+
+        if self.feature21.isChecked():
+            if len(self.list_corr_features) == 0:
+                self.list_corr_features = attr_data[features_list[21]]
+            else:
+                self.list_corr_features = pd.concat([self.list_corr_features, attr_data[features_list[21]]], axis=1)
+
+        if self.feature22.isChecked():
+            if len(self.list_corr_features) == 0:
+                self.list_corr_features = attr_data[features_list[22]]
+            else:
+                self.list_corr_features = pd.concat([self.list_corr_features, attr_data[features_list[22]]], axis=1)
+
+        if self.feature23.isChecked():
+            if len(self.list_corr_features) == 0:
+                self.list_corr_features = attr_data[features_list[23]]
+            else:
+                self.list_corr_features = pd.concat([self.list_corr_features, attr_data[features_list[23]]], axis=1)
+
+        if self.feature24.isChecked():
+            if len(self.list_corr_features) == 0:
+                self.list_corr_features = attr_data[features_list[24]]
+            else:
+                self.list_corr_features = pd.concat([self.list_corr_features, attr_data[features_list[24]]], axis=1)
+
+        if self.feature25.isChecked():
+            if len(self.list_corr_features) == 0:
+                self.list_corr_features = attr_data[features_list[25]]
+            else:
+                self.list_corr_features = pd.concat([self.list_corr_features, attr_data[features_list[25]]], axis=1)
+
+        if self.feature26.isChecked():
+            if len(self.list_corr_features) == 0:
+                self.list_corr_features = attr_data[features_list[26]]
+            else:
+                self.list_corr_features = pd.concat([self.list_corr_features, attr_data[features_list[26]]], axis=1)
+
+        if self.feature27.isChecked():
+            if len(self.list_corr_features) == 0:
+                self.list_corr_features = attr_data[features_list[27]]
+            else:
+                self.list_corr_features = pd.concat([self.list_corr_features, attr_data[features_list[27]]], axis=1)
+
+        if self.feature28.isChecked():
+            if len(self.list_corr_features) == 0:
+                self.list_corr_features = attr_data[features_list[28]]
+            else:
+                self.list_corr_features = pd.concat([self.list_corr_features, attr_data[features_list[28]]], axis=1)
+
+        if self.feature29.isChecked():
+            if len(self.list_corr_features) == 0:
+                self.list_corr_features = attr_data[features_list[29]]
+            else:
+                self.list_corr_features = pd.concat([self.list_corr_features, attr_data[features_list[29]]], axis=1)
 
         try:
             vtest_per = float(self.txtPercentTest.text())
@@ -1037,7 +1048,6 @@ class RandomForest(QMainWindow):
             vtest_per=20
             self.txtPercentTest.setText(str(vtest_per))
 
-
         try:
             estimator_input = round(float(self.txtEstimatorCount.text()))
             if (estimator_input < 1000 and estimator_input > 0):
@@ -1049,9 +1059,6 @@ class RandomForest(QMainWindow):
             estimator_input=35
             self.txtEstimatorCount.setText(str(estimator_input))
 
-
-        # Clear the graphs to populate them with the new information
-
         self.ax1.clear()
         self.ax2.clear()
         self.ax3.clear()
@@ -1061,19 +1068,15 @@ class RandomForest(QMainWindow):
 
         vtest_per = vtest_per / 100
 
-        # Assign the X and y to run the Random Forest Classifier
-
         X_dt =  self.list_corr_features
-        #temp_X_dt=X_dt.copy()
         y_dt = attr_data[target_variable]
         X_columns=X_dt.columns.tolist()
         labelencoder_columns= list(set(X_columns) & set(label_encoder_variables))
         one_hot_encoder_columns=list(set(X_columns) & set(hot_encoder_variables))
-        #print(labelencoder_columns)
-        #print(one_hot_encoder_columns)
+
         class_le = LabelEncoder()
         class_ohe=OneHotEncoder()
-        #X_dt[labelencoder_columns] = class_le.fit_transform(X_dt[labelencoder_columns])
+
         temp = X_columns.copy()
         for ohe_val in one_hot_encoder_columns:
             temp.remove(ohe_val)
@@ -1081,18 +1084,12 @@ class RandomForest(QMainWindow):
         for le_val in labelencoder_columns:
             temp_X_dt[le_val] = class_le.fit_transform(temp_X_dt[le_val])
         X_dt=pd.concat((temp_X_dt,pd.get_dummies(X_dt[one_hot_encoder_columns])),1)
-        # fit and transform the class
 
         y_dt = class_le.fit_transform(y_dt)
 
-        # split the dataset into train and test
-
         X_train, X_test, y_train, y_test = train_test_split(X_dt, y_dt, test_size=vtest_per, random_state=500)
 
-        # perform training with entropy.
-        # Decision tree with entropy
-
-        #specify random forest classifier
+        # specify random forest classifier
         self.clf_rf = RandomForestClassifier(n_estimators=estimator_input, random_state=500)
 
         # perform training
@@ -1100,7 +1097,7 @@ class RandomForest(QMainWindow):
 
         #-----------------------------------------------------------------------
 
-        # predicton on test using all features
+        # prediction on test using all features
         y_pred = self.clf_rf.predict(X_test)
         y_pred_score = self.clf_rf.predict_proba(X_test)
 
@@ -1152,10 +1149,8 @@ class RandomForest(QMainWindow):
         self.fig.tight_layout()
         self.fig.canvas.draw_idle()
 
-        ## End Graph1 -- Confusion Matrix
-
         #::----------------------------------------
-        ## Graph 2 - ROC Curve
+        ## Graph 2 - AUC Score vs Number of Trees
         #::----------------------------------------
 
         auc_test = []
@@ -1180,10 +1175,11 @@ class RandomForest(QMainWindow):
 
         self.fig2.tight_layout()
         self.fig2.canvas.draw_idle()
-        ######################################
-        # Graph - 3 Feature Importances
-        #####################################
-        # get feature importances
+
+        #::----------------------------------------
+        ## Graph 3 - Importance of Features
+        #::----------------------------------------
+
         importances = self.clf_rf.feature_importances_
 
         # convert the importances into one-dimensional 1darray with corresponding df column names as axis labels
@@ -1205,21 +1201,17 @@ class RandomForest(QMainWindow):
         #::-----------------------------------------------------
         # Graph 4 - ROC Curve by Class
         #::-----------------------------------------------------
+
         y_test_bin = pd.get_dummies(y_test).to_numpy()
         n_classes = y_test_bin.shape[1]
 
-        # From the sckict learn site
-        # https://scikit-learn.org/stable/auto_examples/model_selection/plot_roc.html
         fpr = dict()
         tpr = dict()
         roc_auc = dict()
         for i in range(n_classes):
             fpr[i], tpr[i], _ = roc_curve(y_test_bin[:, i], y_pred_score[:, i])
             roc_auc[i] = auc(fpr[i], tpr[i])
-        # print(pd.get_dummies(y_test).to_numpy().ravel())
 
-        # print("\n\n********************************\n\n")
-        # print(y_pred_score.ravel())
         # Compute micro-average ROC curve and ROC area
         fpr["micro"], tpr["micro"], _ = roc_curve(y_test_bin.ravel(), y_pred_score.ravel())
 
@@ -1243,10 +1235,6 @@ class RandomForest(QMainWindow):
         self.fig4.tight_layout()
         self.fig4.canvas.draw_idle()
 
-        #::-----------------------------
-        # End of graph 4  - ROC curve by class
-        #::-----------------------------
-
         #::-----------------------------------------------------
         # Other Models Comparison
         #::-----------------------------------------------------
@@ -1269,18 +1257,14 @@ class RandomForest(QMainWindow):
         self.accuracy_knn = accuracy_score(y_test, y_pred_knn) * 100
         self.txtAccuracy_knn.setText(str(self.accuracy_knn))
 
-        #::-----------------------------
-        # End of Other Models Comparison
-        #::-----------------------------
-
 
 class DecisionTree(QMainWindow):
     #::--------------------------------------------------------------------------------
-    # Implementation of Random Forest Classifier using the happiness dataset
+    # Decision Tree Classifier using the attrition dataset
     # the methods in this class are
     #       _init_ : initialize the class
     #       initUi : creates the canvas and all the elements in the canvas
-    #       update : populates the elements of the canvas base on the parametes
+    #       update : populates the elements of the canvas base on the parameters
     #               chosen by the user
     #::---------------------------------------------------------------------------------
     send_fig = pyqtSignal(str)
@@ -1291,13 +1275,6 @@ class DecisionTree(QMainWindow):
         self.initUi()
 
     def initUi(self):
-        #::-----------------------------------------------------------------
-        #  Create the canvas and all the element to create a dashboard with
-        #  all the necessary elements to present the results from the algorithm
-        #  The canvas is divided using a  grid loyout to facilitate the drawing
-        #  of the elements
-        #::-----------------------------------------------------------------
-
         self.setWindowTitle(self.Title)
         self.setStyleSheet(font_size_window)
 
@@ -1309,7 +1286,6 @@ class DecisionTree(QMainWindow):
         self.groupBox1Layout= QGridLayout()   # Grid
         self.groupBox1.setLayout(self.groupBox1Layout)
 
-        # We create a checkbox of each Features
         self.feature0 = QCheckBox(features_list[0],self)
         self.feature1 = QCheckBox(features_list[1],self)
         self.feature2 = QCheckBox(features_list[2], self)
@@ -1422,15 +1398,9 @@ class DecisionTree(QMainWindow):
         self.lblResults = QLabel('Results:')
         self.lblResults.adjustSize()
         self.txtResults = QPlainTextEdit()
-        #self.txtResults.setMinimumSize(200,100)
-        #self.lblAccuracy = QLabel('Accuracy:')
-        #self.txtAccuracy = QLineEdit()
 
         self.groupBox2Layout.addWidget(self.lblResults)
         self.groupBox2Layout.addWidget(self.txtResults)
-        #self.groupBox2Layout.addWidget(self.lblAccuracy)
-        #self.groupBox2Layout.addWidget(self.txtAccuracy)
-
 
         self.groupBox3 = QGroupBox('Summary and Comparison')
         self.groupBox3Layout = QVBoxLayout()
@@ -1439,8 +1409,7 @@ class DecisionTree(QMainWindow):
         self.lbl_current_model_summary = QLabel('Summary:')
         self.current_model_summary = QWidget(self)
         self.current_model_summary.layout = QFormLayout(self.current_model_summary)
-        # self.other_modelsLayout = QFormLayout()
-        # self.other_models.setLayout(self.other_modelsLayout)
+
         self.txtCurrentAccuracy = QLineEdit()
         self.txtCurrentPrecision = QLineEdit()
         self.txtCurrentRecall = QLineEdit()
@@ -1452,8 +1421,7 @@ class DecisionTree(QMainWindow):
         self.lbl_other_models = QLabel('Other Models Accuracy:')
         self.other_models = QWidget(self)
         self.other_models.layout = QFormLayout(self.other_models)
-        #self.other_modelsLayout = QFormLayout()
-        #self.other_models.setLayout(self.other_modelsLayout)
+
         self.txtAccuracy_lr = QLineEdit()
         self.txtAccuracy_knn = QLineEdit()
         self.txtAccuracy_rf = QLineEdit()
@@ -1465,7 +1433,6 @@ class DecisionTree(QMainWindow):
         self.groupBox3Layout.addWidget(self.current_model_summary)
         self.groupBox3Layout.addWidget(self.lbl_other_models)
         self.groupBox3Layout.addWidget(self.other_models)
-
 
         #::--------------------------------------
         # Graphic 1 : Confusion Matrix
@@ -1487,7 +1454,7 @@ class DecisionTree(QMainWindow):
         self.groupBoxG1Layout.addWidget(self.canvas)
 
         #::---------------------------------------
-        # Graphic 2 : ROC Curve
+        # Graphic 2 : Decision Tree Graph
         #::---------------------------------------
 
         self.labelImage = QLabel(self)
@@ -1497,16 +1464,6 @@ class DecisionTree(QMainWindow):
         self.image_area.setWidget(self.labelImage)
         self.labelImage.setPixmap(QPixmap("temp_background.png"))
         self.labelImage.adjustSize()
-        #vbox.addWidget(labelImage)
-
-        #self.image = QPixmap()
-        #label.setPixmap(pixmap)
-        #self.resize(pixmap.width(), pixmap.height())
-        #self.canvas2 = FigureCanvas(self.image)
-
-        #self.canvas2.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-
-        #self.canvas2.updateGeometry()
 
         self.groupBoxG2 = QGroupBox('Decision Tree Graph')
         self.groupBoxG2Layout = QVBoxLayout()
@@ -1532,7 +1489,7 @@ class DecisionTree(QMainWindow):
         self.groupBoxG3Layout.addWidget(self.canvas3)
 
         #::--------------------------------------------
-        # Graphic 4 : ROC Curve by class
+        # Graphic 4 : ROC Curve by Class
         #::--------------------------------------------
 
         self.fig4 = Figure()
@@ -1566,16 +1523,6 @@ class DecisionTree(QMainWindow):
         self.show()
 
     def update(self):
-        '''
-        Random Forest Classifier
-        We pupulate the dashboard using the parametres chosen by the user
-        The parameters are processed to execute in the skit-learn Random Forest algorithm
-          then the results are presented in graphics and reports in the canvas
-        :return:None
-        '''
-
-        # processing the parameters
-
         self.list_corr_features = pd.DataFrame([])
         if self.feature0.isChecked():
             if len(self.list_corr_features)==0:
@@ -1697,6 +1644,65 @@ class DecisionTree(QMainWindow):
             else:
                 self.list_corr_features = pd.concat([self.list_corr_features, attr_data[features_list[19]]], axis=1)
 
+        if self.feature20.isChecked():
+            if len(self.list_corr_features)==0:
+                self.list_corr_features = attr_data[features_list[20]]
+            else:
+                self.list_corr_features = pd.concat([self.list_corr_features, attr_data[features_list[20]]],axis=1)
+
+        if self.feature21.isChecked():
+            if len(self.list_corr_features) == 0:
+                self.list_corr_features = attr_data[features_list[21]]
+            else:
+                self.list_corr_features = pd.concat([self.list_corr_features, attr_data[features_list[21]]],axis=1)
+
+        if self.feature22.isChecked():
+            if len(self.list_corr_features) == 0:
+                self.list_corr_features = attr_data[features_list[22]]
+            else:
+                self.list_corr_features = pd.concat([self.list_corr_features, attr_data[features_list[22]]],axis=1)
+
+        if self.feature23.isChecked():
+            if len(self.list_corr_features) == 0:
+                self.list_corr_features = attr_data[features_list[23]]
+            else:
+                self.list_corr_features = pd.concat([self.list_corr_features, attr_data[features_list[23]]],axis=1)
+
+        if self.feature24.isChecked():
+            if len(self.list_corr_features) == 0:
+                self.list_corr_features = attr_data[features_list[24]]
+            else:
+                self.list_corr_features = pd.concat([self.list_corr_features, attr_data[features_list[24]]],axis=1)
+
+        if self.feature25.isChecked():
+            if len(self.list_corr_features) == 0:
+                self.list_corr_features = attr_data[features_list[25]]
+            else:
+                self.list_corr_features = pd.concat([self.list_corr_features, attr_data[features_list[25]]],axis=1)
+
+        if self.feature26.isChecked():
+            if len(self.list_corr_features) == 0:
+                self.list_corr_features = attr_data[features_list[26]]
+            else:
+                self.list_corr_features = pd.concat([self.list_corr_features, attr_data[features_list[26]]],axis=1)
+
+        if self.feature27.isChecked():
+            if len(self.list_corr_features) == 0:
+                self.list_corr_features = attr_data[features_list[27]]
+            else:
+                self.list_corr_features = pd.concat([self.list_corr_features, attr_data[features_list[27]]],axis=1)
+
+        if self.feature28.isChecked():
+            if len(self.list_corr_features) == 0:
+                self.list_corr_features = attr_data[features_list[28]]
+            else:
+                self.list_corr_features = pd.concat([self.list_corr_features, attr_data[features_list[28]]],axis=1)
+
+        if self.feature29.isChecked():
+            if len(self.list_corr_features) == 0:
+                self.list_corr_features = attr_data[features_list[29]]
+            else:
+                self.list_corr_features = pd.concat([self.list_corr_features, attr_data[features_list[29]]],axis=1)
 
         try:
             vtest_per = float(self.txtPercentTest.text())
@@ -1709,8 +1715,6 @@ class DecisionTree(QMainWindow):
             vtest_per=20
             self.txtPercentTest.setText(str(vtest_per))
 
-        # Clear the graphs to populate them with the new information
-
         self.ax1.clear()
         self.ax3.clear()
         self.ax4.clear()
@@ -1719,19 +1723,15 @@ class DecisionTree(QMainWindow):
 
         vtest_per = vtest_per / 100
 
-        # Assign the X and y to run the Random Forest Classifier
-
         X_dt =  self.list_corr_features
-        #temp_X_dt=X_dt.copy()
         y_dt = attr_data[target_variable]
         X_columns=X_dt.columns.tolist()
         labelencoder_columns= list(set(X_columns) & set(label_encoder_variables))
         one_hot_encoder_columns=list(set(X_columns) & set(hot_encoder_variables))
-        #print(labelencoder_columns)
-        #print(one_hot_encoder_columns)
+
         class_le = LabelEncoder()
         class_ohe=OneHotEncoder()
-        #X_dt[labelencoder_columns] = class_le.fit_transform(X_dt[labelencoder_columns])
+
         temp = X_columns.copy()
         for ohe_val in one_hot_encoder_columns:
             temp.remove(ohe_val)
@@ -1739,18 +1739,12 @@ class DecisionTree(QMainWindow):
         for le_val in labelencoder_columns:
             temp_X_dt[le_val] = class_le.fit_transform(temp_X_dt[le_val])
         X_dt=pd.concat((temp_X_dt,pd.get_dummies(X_dt[one_hot_encoder_columns])),1)
-        # fit and transform the class
 
         y_dt = class_le.fit_transform(y_dt)
 
-        # split the dataset into train and test
-
         X_train, X_test, y_train, y_test = train_test_split(X_dt, y_dt, test_size=vtest_per, random_state=500)
 
-        # perform training with entropy.
-        # Decision tree with entropy
-
-        #specify random forest classifier
+        # specify decision tree classifier
         self.clf_dt =DecisionTreeClassifier(criterion="gini")
 
         # perform training
@@ -1758,12 +1752,12 @@ class DecisionTree(QMainWindow):
 
         #-----------------------------------------------------------------------
 
-        # predicton on test using all features
+        # prediction on test using all features
         y_pred = self.clf_dt.predict(X_test)
         y_pred_score = self.clf_dt.predict_proba(X_test)
 
 
-        # confusion matrix for RandomForest
+        # confusion matrix for Decision Tree
         conf_matrix = confusion_matrix(y_test, y_pred)
 
         # clasification report
@@ -1810,16 +1804,9 @@ class DecisionTree(QMainWindow):
         self.fig.tight_layout()
         self.fig.canvas.draw_idle()
 
-        ## End Graph1 -- Confusion Matrix
-
         #::----------------------------------------
-        ## Graph 2 - ROC Curve
+        ## Graph 2 - Decision Tree Graph
         #::----------------------------------------
-
-
-
-        #self.fig2.tight_layout()
-        #self.fig2.canvas.draw_idle()
 
         dot_data = export_graphviz(self.clf_dt,
                                         feature_names=X_train.columns,
@@ -1846,16 +1833,15 @@ class DecisionTree(QMainWindow):
         self.labelImage.setPixmap(QPixmap("DecisionTree_Attrition.png"))
         self.labelImage.adjustSize()
 
-        ######################################
-        # Graph - 3 Feature Importances
-        #####################################
-        # get feature importances
+        #::----------------------------------------
+        ## Graph 3 - Importance of Features
+        #::----------------------------------------
 
         importances = self.clf_dt.feature_importances_
 
         # convert the importances into one-dimensional 1darray with corresponding df column names as axis labels
         f_importances = pd.Series(importances, X_dt.columns)
-        #print(f_importances)
+
         # sort the array in descending order of the importances
         f_importances.sort_values(ascending=False, inplace=True)
         f_importances=f_importances[0:10]
@@ -1872,24 +1858,17 @@ class DecisionTree(QMainWindow):
         #::-----------------------------------------------------
         # Graph 4 - ROC Curve by Class
         #::-----------------------------------------------------
-        # y_test_bin = label_binarize(y_test, classes=[0, 1])
-        # print(pd.get_dummies(y_test))
-        # print(pd.get_dummies(y_test).to_numpy())
+
         y_test_bin = pd.get_dummies(y_test).to_numpy()
         n_classes = y_test_bin.shape[1]
 
-        # From the sckict learn site
-        # https://scikit-learn.org/stable/auto_examples/model_selection/plot_roc.html
         fpr = dict()
         tpr = dict()
         roc_auc = dict()
         for i in range(n_classes):
             fpr[i], tpr[i], _ = roc_curve(y_test_bin[:, i], y_pred_score[:, i])
             roc_auc[i] = auc(fpr[i], tpr[i])
-        # print(pd.get_dummies(y_test).to_numpy().ravel())
 
-        # print("\n\n********************************\n\n")
-        # print(y_pred_score.ravel())
         # Compute micro-average ROC curve and ROC area
         fpr["micro"], tpr["micro"], _ = roc_curve(y_test_bin.ravel(), y_pred_score.ravel())
 
@@ -1914,10 +1893,6 @@ class DecisionTree(QMainWindow):
         self.fig4.tight_layout()
         self.fig4.canvas.draw_idle()
 
-        #::-----------------------------
-        # End of graph 4  - ROC curve by class
-        #::-----------------------------
-
         #::-----------------------------------------------------
         # Other Models Comparison
         #::-----------------------------------------------------
@@ -1940,18 +1915,14 @@ class DecisionTree(QMainWindow):
         self.accuracy_knn = accuracy_score(y_test, y_pred_knn) * 100
         self.txtAccuracy_knn.setText(str(self.accuracy_knn))
 
-        #::-----------------------------
-        # End of Other Models Comparison
-        #::-----------------------------
-
 
 class LogisticRegressionClassifier(QMainWindow):
     #::--------------------------------------------------------------------------------
-    # Implementation of LOgistic Regression using the happiness dataset
+    # Logistic Regression using the attrition dataset
     # the methods in this class are
     #       _init_ : initialize the class
     #       initUi : creates the canvas and all the elements in the canvas
-    #       update : populates the elements of the canvas base on the parametes
+    #       update : populates the elements of the canvas base on the parameters
     #               chosen by the user
     #::---------------------------------------------------------------------------------
     send_fig = pyqtSignal(str)
@@ -1962,13 +1933,6 @@ class LogisticRegressionClassifier(QMainWindow):
         self.initUi()
 
     def initUi(self):
-        #::-----------------------------------------------------------------
-        #  Create the canvas and all the element to create a dashboard with
-        #  all the necessary elements to present the results from the algorithm
-        #  The canvas is divided using a  grid loyout to facilitate the drawing
-        #  of the elements
-        #::-----------------------------------------------------------------
-
         self.setWindowTitle(self.Title)
         self.setStyleSheet(font_size_window)
 
@@ -1977,10 +1941,9 @@ class LogisticRegressionClassifier(QMainWindow):
         self.layout = QGridLayout(self.main_widget)
 
         self.groupBox1 = QGroupBox('Logistic Regression Features')
-        self.groupBox1Layout= QGridLayout()   # Grid
+        self.groupBox1Layout= QGridLayout()
         self.groupBox1.setLayout(self.groupBox1Layout)
 
-        # We create a checkbox of each Features
         self.feature0 = QCheckBox(features_list[0],self)
         self.feature1 = QCheckBox(features_list[1],self)
         self.feature2 = QCheckBox(features_list[2], self)
@@ -2090,19 +2053,12 @@ class LogisticRegressionClassifier(QMainWindow):
         self.groupBox2.setLayout(self.groupBox2Layout)
         self.groupBox2.setMinimumSize(400, 50)
 
-
         self.lblResults = QLabel('Results:')
         self.lblResults.adjustSize()
         self.txtResults = QPlainTextEdit()
-        #self.txtResults.setMinimumSize(200,100)
-        #self.lblAccuracy = QLabel('Accuracy:')
-        #self.txtAccuracy = QLineEdit()
 
         self.groupBox2Layout.addWidget(self.lblResults)
         self.groupBox2Layout.addWidget(self.txtResults)
-        #self.groupBox2Layout.addWidget(self.lblAccuracy)
-        #self.groupBox2Layout.addWidget(self.txtAccuracy)
-
 
         self.groupBox3 = QGroupBox('Summary and Comparison')
         self.groupBox3Layout = QVBoxLayout()
@@ -2111,8 +2067,7 @@ class LogisticRegressionClassifier(QMainWindow):
         self.lbl_current_model_summary = QLabel('Summary:')
         self.current_model_summary = QWidget(self)
         self.current_model_summary.layout = QFormLayout(self.current_model_summary)
-        # self.other_modelsLayout = QFormLayout()
-        # self.other_models.setLayout(self.other_modelsLayout)
+
         self.txtCurrentAccuracy = QLineEdit()
         self.txtCurrentPrecision = QLineEdit()
         self.txtCurrentRecall = QLineEdit()
@@ -2125,8 +2080,7 @@ class LogisticRegressionClassifier(QMainWindow):
         self.lbl_other_models = QLabel('Other Models Accuracy:')
         self.other_models = QWidget(self)
         self.other_models.layout = QFormLayout(self.other_models)
-        #self.other_modelsLayout = QFormLayout()
-        #self.other_models.setLayout(self.other_modelsLayout)
+
         self.txtAccuracy_rf = QLineEdit()
         self.txtAccuracy_knn = QLineEdit()
         self.txtAccuracy_dt = QLineEdit()
@@ -2138,7 +2092,6 @@ class LogisticRegressionClassifier(QMainWindow):
         self.groupBox3Layout.addWidget(self.current_model_summary)
         self.groupBox3Layout.addWidget(self.lbl_other_models)
         self.groupBox3Layout.addWidget(self.other_models)
-
 
         #::--------------------------------------
         # Graphic 1 : Confusion Matrix
@@ -2160,7 +2113,7 @@ class LogisticRegressionClassifier(QMainWindow):
         self.groupBoxG1Layout.addWidget(self.canvas)
 
         #::---------------------------------------
-        # Graphic 2 : ROC Curve
+        # Graphic 2 : Calibration Curve
         #::---------------------------------------
 
         self.fig2 = Figure()
@@ -2179,7 +2132,7 @@ class LogisticRegressionClassifier(QMainWindow):
         self.groupBoxG2Layout.addWidget(self.canvas2)
 
         #::-------------------------------------------
-        # Graphic 3 : Importance of Features
+        # Graphic 3 : Cross Validation Score
         #::-------------------------------------------
 
         self.fig3 = Figure()
@@ -2231,76 +2184,66 @@ class LogisticRegressionClassifier(QMainWindow):
         self.show()
 
     def update(self):
-        '''
-        Random Forest Classifier
-        We pupulate the dashboard using the parametres chosen by the user
-        The parameters are processed to execute in the skit-learn Random Forest algorithm
-          then the results are presented in graphics and reports in the canvas
-        :return:None
-        '''
-
-        # processing the parameters
-
         self.list_corr_features = pd.DataFrame([])
         if self.feature0.isChecked():
-            if len(self.list_corr_features)==0:
+            if len(self.list_corr_features) == 0:
                 self.list_corr_features = attr_data[features_list[0]]
             else:
-                self.list_corr_features = pd.concat([self.list_corr_features, attr_data[features_list[0]]],axis=1)
+                self.list_corr_features = pd.concat([self.list_corr_features, attr_data[features_list[0]]], axis=1)
 
         if self.feature1.isChecked():
             if len(self.list_corr_features) == 0:
                 self.list_corr_features = attr_data[features_list[1]]
             else:
-                self.list_corr_features = pd.concat([self.list_corr_features, attr_data[features_list[1]]],axis=1)
+                self.list_corr_features = pd.concat([self.list_corr_features, attr_data[features_list[1]]], axis=1)
 
         if self.feature2.isChecked():
             if len(self.list_corr_features) == 0:
                 self.list_corr_features = attr_data[features_list[2]]
             else:
-                self.list_corr_features = pd.concat([self.list_corr_features, attr_data[features_list[2]]],axis=1)
+                self.list_corr_features = pd.concat([self.list_corr_features, attr_data[features_list[2]]], axis=1)
 
         if self.feature3.isChecked():
             if len(self.list_corr_features) == 0:
                 self.list_corr_features = attr_data[features_list[3]]
             else:
-                self.list_corr_features = pd.concat([self.list_corr_features, attr_data[features_list[3]]],axis=1)
+                self.list_corr_features = pd.concat([self.list_corr_features, attr_data[features_list[3]]], axis=1)
 
         if self.feature4.isChecked():
             if len(self.list_corr_features) == 0:
                 self.list_corr_features = attr_data[features_list[4]]
             else:
-                self.list_corr_features = pd.concat([self.list_corr_features, attr_data[features_list[4]]],axis=1)
+                self.list_corr_features = pd.concat([self.list_corr_features, attr_data[features_list[4]]], axis=1)
 
         if self.feature5.isChecked():
             if len(self.list_corr_features) == 0:
                 self.list_corr_features = attr_data[features_list[5]]
             else:
-                self.list_corr_features = pd.concat([self.list_corr_features, attr_data[features_list[5]]],axis=1)
+                self.list_corr_features = pd.concat([self.list_corr_features, attr_data[features_list[5]]], axis=1)
 
         if self.feature6.isChecked():
             if len(self.list_corr_features) == 0:
                 self.list_corr_features = attr_data[features_list[6]]
             else:
-                self.list_corr_features = pd.concat([self.list_corr_features, attr_data[features_list[6]]],axis=1)
+                self.list_corr_features = pd.concat([self.list_corr_features, attr_data[features_list[6]]], axis=1)
 
         if self.feature7.isChecked():
             if len(self.list_corr_features) == 0:
                 self.list_corr_features = attr_data[features_list[7]]
             else:
-                self.list_corr_features = pd.concat([self.list_corr_features, attr_data[features_list[7]]],axis=1)
+                self.list_corr_features = pd.concat([self.list_corr_features, attr_data[features_list[7]]], axis=1)
 
         if self.feature8.isChecked():
             if len(self.list_corr_features) == 0:
                 self.list_corr_features = attr_data[features_list[8]]
             else:
-                self.list_corr_features = pd.concat([self.list_corr_features, attr_data[features_list[8]]],axis=1)
+                self.list_corr_features = pd.concat([self.list_corr_features, attr_data[features_list[8]]], axis=1)
 
         if self.feature9.isChecked():
             if len(self.list_corr_features) == 0:
                 self.list_corr_features = attr_data[features_list[9]]
             else:
-                self.list_corr_features = pd.concat([self.list_corr_features, attr_data[features_list[9]]],axis=1)
+                self.list_corr_features = pd.concat([self.list_corr_features, attr_data[features_list[9]]], axis=1)
 
         if self.feature10.isChecked():
             if len(self.list_corr_features) == 0:
@@ -2362,6 +2305,65 @@ class LogisticRegressionClassifier(QMainWindow):
             else:
                 self.list_corr_features = pd.concat([self.list_corr_features, attr_data[features_list[19]]], axis=1)
 
+        if self.feature20.isChecked():
+            if len(self.list_corr_features) == 0:
+                self.list_corr_features = attr_data[features_list[20]]
+            else:
+                self.list_corr_features = pd.concat([self.list_corr_features, attr_data[features_list[20]]], axis=1)
+
+        if self.feature21.isChecked():
+            if len(self.list_corr_features) == 0:
+                self.list_corr_features = attr_data[features_list[21]]
+            else:
+                self.list_corr_features = pd.concat([self.list_corr_features, attr_data[features_list[21]]], axis=1)
+
+        if self.feature22.isChecked():
+            if len(self.list_corr_features) == 0:
+                self.list_corr_features = attr_data[features_list[22]]
+            else:
+                self.list_corr_features = pd.concat([self.list_corr_features, attr_data[features_list[22]]], axis=1)
+
+        if self.feature23.isChecked():
+            if len(self.list_corr_features) == 0:
+                self.list_corr_features = attr_data[features_list[23]]
+            else:
+                self.list_corr_features = pd.concat([self.list_corr_features, attr_data[features_list[23]]], axis=1)
+
+        if self.feature24.isChecked():
+            if len(self.list_corr_features) == 0:
+                self.list_corr_features = attr_data[features_list[24]]
+            else:
+                self.list_corr_features = pd.concat([self.list_corr_features, attr_data[features_list[24]]], axis=1)
+
+        if self.feature25.isChecked():
+            if len(self.list_corr_features) == 0:
+                self.list_corr_features = attr_data[features_list[25]]
+            else:
+                self.list_corr_features = pd.concat([self.list_corr_features, attr_data[features_list[25]]], axis=1)
+
+        if self.feature26.isChecked():
+            if len(self.list_corr_features) == 0:
+                self.list_corr_features = attr_data[features_list[26]]
+            else:
+                self.list_corr_features = pd.concat([self.list_corr_features, attr_data[features_list[26]]], axis=1)
+
+        if self.feature27.isChecked():
+            if len(self.list_corr_features) == 0:
+                self.list_corr_features = attr_data[features_list[27]]
+            else:
+                self.list_corr_features = pd.concat([self.list_corr_features, attr_data[features_list[27]]], axis=1)
+
+        if self.feature28.isChecked():
+            if len(self.list_corr_features) == 0:
+                self.list_corr_features = attr_data[features_list[28]]
+            else:
+                self.list_corr_features = pd.concat([self.list_corr_features, attr_data[features_list[28]]], axis=1)
+
+        if self.feature29.isChecked():
+            if len(self.list_corr_features) == 0:
+                self.list_corr_features = attr_data[features_list[29]]
+            else:
+                self.list_corr_features = pd.concat([self.list_corr_features, attr_data[features_list[29]]], axis=1)
 
         try:
             vtest_per = float(self.txtPercentTest.text())
@@ -2374,8 +2376,6 @@ class LogisticRegressionClassifier(QMainWindow):
             vtest_per=20
             self.txtPercentTest.setText(str(vtest_per))
 
-        # Clear the graphs to populate them with the new information
-
         self.ax1.clear()
         self.ax2.clear()
         self.ax3.clear()
@@ -2385,19 +2385,15 @@ class LogisticRegressionClassifier(QMainWindow):
 
         vtest_per = vtest_per / 100
 
-        # Assign the X and y to run the Random Forest Classifier
-
         X_dt =  self.list_corr_features
-        #temp_X_dt=X_dt.copy()
         y_dt = attr_data[target_variable]
         X_columns=X_dt.columns.tolist()
         labelencoder_columns= list(set(X_columns) & set(label_encoder_variables))
         one_hot_encoder_columns=list(set(X_columns) & set(hot_encoder_variables))
-        #print(labelencoder_columns)
-        #print(one_hot_encoder_columns)
+
         class_le = LabelEncoder()
         class_ohe=OneHotEncoder()
-        #X_dt[labelencoder_columns] = class_le.fit_transform(X_dt[labelencoder_columns])
+
         temp = X_columns.copy()
         for ohe_val in one_hot_encoder_columns:
             temp.remove(ohe_val)
@@ -2405,18 +2401,12 @@ class LogisticRegressionClassifier(QMainWindow):
         for le_val in labelencoder_columns:
             temp_X_dt[le_val] = class_le.fit_transform(temp_X_dt[le_val])
         X_dt=pd.concat((temp_X_dt,pd.get_dummies(X_dt[one_hot_encoder_columns])),1)
-        # fit and transform the class
 
         y_dt = class_le.fit_transform(y_dt)
 
-        # split the dataset into train and test
-
         X_train, X_test, y_train, y_test = train_test_split(X_dt, y_dt, test_size=vtest_per, random_state=500)
 
-        # perform training with entropy.
-        # Decision tree with entropy
-
-        #specify random forest classifier
+        # specify logistic regression
         self.clf_lr = LogisticRegression()
 
         # perform training
@@ -2424,7 +2414,7 @@ class LogisticRegressionClassifier(QMainWindow):
 
         #-----------------------------------------------------------------------
 
-        # predicton on test using all features
+        # prediction on test using all features
         y_pred = self.clf_lr.predict(X_test)
         y_pred_score = self.clf_lr.predict_proba(X_test)
 
@@ -2457,7 +2447,7 @@ class LogisticRegressionClassifier(QMainWindow):
         self.txtCurrentF1score.setText(str(self.ff_f1_score))
 
         #::------------------------------------
-        ##  Ghaph1 :
+        ##  Graph1 :
         ##  Confusion Matrix
         #::------------------------------------
         class_names1 = ['','No', 'Yes']
@@ -2475,10 +2465,8 @@ class LogisticRegressionClassifier(QMainWindow):
         self.fig.tight_layout()
         self.fig.canvas.draw_idle()
 
-        ## End Graph1 -- Confusion Matrix
-
         #::----------------------------------------
-        ## Graph 2 - ROC Curve
+        ## Graph 2 - Calibration Curve
         #::----------------------------------------
 
         logreg_y, logreg_x = calibration_curve(y_test, y_pred_score[:,1], n_bins=10)
@@ -2491,24 +2479,19 @@ class LogisticRegressionClassifier(QMainWindow):
         self.fig2.tight_layout()
         self.fig2.canvas.draw_idle()
 
+        #::----------------------------------------
+        ## Graph 3 - Cross Validation Score
+        #::----------------------------------------
 
-        ######################################
-        # Graph - 3 Feature Importances
-        #####################################
-        # get feature importances
         scores_arr = []
-        #feature_arr = []
+
         for val in (X_train.columns):
             cvs_X = X_test[val].values.reshape(-1, 1)
             scores = cross_val_score(self.clf_lr, cvs_X, y_test, cv=5)
             scores_arr.append(scores.mean())
-            #print(scores,scores.mean())
 
-        #importances = self.clf_knn.feature_importances_
-
-        # convert the importances into one-dimensional 1darray with corresponding df column names as axis labels
         f_importances = pd.Series(scores_arr, X_train.columns)
-        # sort the array in descending order of the importances
+
         f_importances.sort_values(ascending=False, inplace=True)
         f_importances=f_importances[0:20]
         X_Features = f_importances.index
@@ -2517,8 +2500,6 @@ class LogisticRegressionClassifier(QMainWindow):
         min_value = f_importances.min()
         self.ax3.barh(X_Features, y_Importance )
         self.ax3.set_xlim(min_value-(min_value*0.05),max_value+(max_value*0.05))
-        #self.ax3.set_aspect('auto')
-
 
         # show the plot
         self.fig3.tight_layout()
@@ -2527,24 +2508,17 @@ class LogisticRegressionClassifier(QMainWindow):
         #::-----------------------------------------------------
         # Graph 4 - ROC Curve by Class
         #::-----------------------------------------------------
-        # y_test_bin = label_binarize(y_test, classes=[0, 1])
-        # print(pd.get_dummies(y_test))
-        # print(pd.get_dummies(y_test).to_numpy())
+
         y_test_bin = pd.get_dummies(y_test).to_numpy()
         n_classes = y_test_bin.shape[1]
 
-        # From the sckict learn site
-        # https://scikit-learn.org/stable/auto_examples/model_selection/plot_roc.html
         fpr = dict()
         tpr = dict()
         roc_auc = dict()
         for i in range(n_classes):
             fpr[i], tpr[i], _ = roc_curve(y_test_bin[:, i], y_pred_score[:, i])
             roc_auc[i] = auc(fpr[i], tpr[i])
-        # print(pd.get_dummies(y_test).to_numpy().ravel())
 
-        # print("\n\n********************************\n\n")
-        # print(y_pred_score.ravel())
         # Compute micro-average ROC curve and ROC area
         fpr["micro"], tpr["micro"], _ = roc_curve(y_test_bin.ravel(), y_pred_score.ravel())
 
@@ -2568,10 +2542,6 @@ class LogisticRegressionClassifier(QMainWindow):
         self.fig4.tight_layout()
         self.fig4.canvas.draw_idle()
 
-        #::-----------------------------
-        # End of graph 4  - ROC curve by class
-        #::-----------------------------
-
         #::-----------------------------------------------------
         # Other Models Comparison
         #::-----------------------------------------------------
@@ -2594,35 +2564,24 @@ class LogisticRegressionClassifier(QMainWindow):
         self.accuracy_knn = accuracy_score(y_test, y_pred_knn) * 100
         self.txtAccuracy_knn.setText(str(self.accuracy_knn))
 
-        #::-----------------------------
-        # End of Other Models Comparison
-        #::-----------------------------
-
 
 class KNNClassifier(QMainWindow):
     #::--------------------------------------------------------------------------------
-    # Implementation of LOgistic Regression using the happiness dataset
+    # K Nearest Neighbours Classifier using the happiness dataset
     # the methods in this class are
     #       _init_ : initialize the class
     #       initUi : creates the canvas and all the elements in the canvas
-    #       update : populates the elements of the canvas base on the parametes
+    #       update : populates the elements of the canvas base on the parameters
     #               chosen by the user
     #::---------------------------------------------------------------------------------
     send_fig = pyqtSignal(str)
 
     def __init__(self):
         super(KNNClassifier, self).__init__()
-        self.Title = "K-Nearst Neighbor"
+        self.Title = "K-Nearest Neighbor"
         self.initUi()
 
     def initUi(self):
-        #::-----------------------------------------------------------------
-        #  Create the canvas and all the element to create a dashboard with
-        #  all the necessary elements to present the results from the algorithm
-        #  The canvas is divided using a  grid loyout to facilitate the drawing
-        #  of the elements
-        #::-----------------------------------------------------------------
-
         self.setWindowTitle(self.Title)
         self.setStyleSheet(font_size_window)
 
@@ -2631,10 +2590,9 @@ class KNNClassifier(QMainWindow):
         self.layout = QGridLayout(self.main_widget)
 
         self.groupBox1 = QGroupBox('K - Nearest Neighbor Features')
-        self.groupBox1Layout= QGridLayout()   # Grid
+        self.groupBox1Layout= QGridLayout()
         self.groupBox1.setLayout(self.groupBox1Layout)
 
-        # We create a checkbox of each Features
         self.feature0 = QCheckBox(features_list[0],self)
         self.feature1 = QCheckBox(features_list[1],self)
         self.feature2 = QCheckBox(features_list[2], self)
@@ -2755,15 +2713,9 @@ class KNNClassifier(QMainWindow):
         self.lblResults = QLabel('Results:')
         self.lblResults.adjustSize()
         self.txtResults = QPlainTextEdit()
-        #self.txtResults.setMinimumSize(200,100)
-        #self.lblAccuracy = QLabel('Accuracy:')
-        #self.txtAccuracy = QLineEdit()
 
         self.groupBox2Layout.addWidget(self.lblResults)
         self.groupBox2Layout.addWidget(self.txtResults)
-        #self.groupBox2Layout.addWidget(self.lblAccuracy)
-        #self.groupBox2Layout.addWidget(self.txtAccuracy)
-
 
         self.groupBox3 = QGroupBox('Summary and Comparison')
         self.groupBox3Layout = QVBoxLayout()
@@ -2772,8 +2724,7 @@ class KNNClassifier(QMainWindow):
         self.lbl_current_model_summary = QLabel('Summary:')
         self.current_model_summary = QWidget(self)
         self.current_model_summary.layout = QFormLayout(self.current_model_summary)
-        # self.other_modelsLayout = QFormLayout()
-        # self.other_models.setLayout(self.other_modelsLayout)
+
         self.txtCurrentAccuracy = QLineEdit()
         self.txtCurrentPrecision = QLineEdit()
         self.txtCurrentRecall = QLineEdit()
@@ -2783,18 +2734,10 @@ class KNNClassifier(QMainWindow):
         self.current_model_summary.layout.addRow('Recall:', self.txtCurrentRecall)
         self.current_model_summary.layout.addRow('F1 Score:', self.txtCurrentF1score)
 
-
-
-
-
-        #self.lbl_summary = QLabel('Summary:')
-        #self.lbl_summary.adjustSize()
-        #self.txt_summary = QPlainTextEdit()
         self.lbl_other_models = QLabel('Other Models Accuracy:')
         self.other_models = QWidget(self)
         self.other_models.layout = QFormLayout(self.other_models)
-        #self.other_modelsLayout = QFormLayout()
-        #self.other_models.setLayout(self.other_modelsLayout)
+
         self.txtAccuracy_rf = QLineEdit()
         self.txtAccuracy_lr = QLineEdit()
         self.txtAccuracy_dt = QLineEdit()
@@ -2828,7 +2771,7 @@ class KNNClassifier(QMainWindow):
         self.groupBoxG1Layout.addWidget(self.canvas)
 
         #::---------------------------------------
-        # Graphic 2 : ROC Curve
+        # Graphic 2 : Accuracy vs. K Value
         #::---------------------------------------
 
         self.fig2 = Figure()
@@ -2847,7 +2790,7 @@ class KNNClassifier(QMainWindow):
         self.groupBoxG2Layout.addWidget(self.canvas2)
 
         #::-------------------------------------------
-        # Graphic 3 : Importance of Features
+        # Graphic 3 : Cross Validation Score
         #::-------------------------------------------
 
         self.fig3 = Figure()
@@ -2899,76 +2842,66 @@ class KNNClassifier(QMainWindow):
         self.show()
 
     def update(self):
-        '''
-        Random Forest Classifier
-        We pupulate the dashboard using the parametres chosen by the user
-        The parameters are processed to execute in the skit-learn Random Forest algorithm
-          then the results are presented in graphics and reports in the canvas
-        :return:None
-        '''
-
-        # processing the parameters
-
         self.list_corr_features = pd.DataFrame([])
         if self.feature0.isChecked():
-            if len(self.list_corr_features)==0:
+            if len(self.list_corr_features) == 0:
                 self.list_corr_features = attr_data[features_list[0]]
             else:
-                self.list_corr_features = pd.concat([self.list_corr_features, attr_data[features_list[0]]],axis=1)
+                self.list_corr_features = pd.concat([self.list_corr_features, attr_data[features_list[0]]], axis=1)
 
         if self.feature1.isChecked():
             if len(self.list_corr_features) == 0:
                 self.list_corr_features = attr_data[features_list[1]]
             else:
-                self.list_corr_features = pd.concat([self.list_corr_features, attr_data[features_list[1]]],axis=1)
+                self.list_corr_features = pd.concat([self.list_corr_features, attr_data[features_list[1]]], axis=1)
 
         if self.feature2.isChecked():
             if len(self.list_corr_features) == 0:
                 self.list_corr_features = attr_data[features_list[2]]
             else:
-                self.list_corr_features = pd.concat([self.list_corr_features, attr_data[features_list[2]]],axis=1)
+                self.list_corr_features = pd.concat([self.list_corr_features, attr_data[features_list[2]]], axis=1)
 
         if self.feature3.isChecked():
             if len(self.list_corr_features) == 0:
                 self.list_corr_features = attr_data[features_list[3]]
             else:
-                self.list_corr_features = pd.concat([self.list_corr_features, attr_data[features_list[3]]],axis=1)
+                self.list_corr_features = pd.concat([self.list_corr_features, attr_data[features_list[3]]], axis=1)
 
         if self.feature4.isChecked():
             if len(self.list_corr_features) == 0:
                 self.list_corr_features = attr_data[features_list[4]]
             else:
-                self.list_corr_features = pd.concat([self.list_corr_features, attr_data[features_list[4]]],axis=1)
+                self.list_corr_features = pd.concat([self.list_corr_features, attr_data[features_list[4]]], axis=1)
 
         if self.feature5.isChecked():
             if len(self.list_corr_features) == 0:
                 self.list_corr_features = attr_data[features_list[5]]
             else:
-                self.list_corr_features = pd.concat([self.list_corr_features, attr_data[features_list[5]]],axis=1)
+                self.list_corr_features = pd.concat([self.list_corr_features, attr_data[features_list[5]]], axis=1)
 
         if self.feature6.isChecked():
             if len(self.list_corr_features) == 0:
                 self.list_corr_features = attr_data[features_list[6]]
             else:
-                self.list_corr_features = pd.concat([self.list_corr_features, attr_data[features_list[6]]],axis=1)
+                self.list_corr_features = pd.concat([self.list_corr_features, attr_data[features_list[6]]], axis=1)
 
         if self.feature7.isChecked():
             if len(self.list_corr_features) == 0:
                 self.list_corr_features = attr_data[features_list[7]]
             else:
-                self.list_corr_features = pd.concat([self.list_corr_features, attr_data[features_list[7]]],axis=1)
+                self.list_corr_features = pd.concat([self.list_corr_features, attr_data[features_list[7]]], axis=1)
 
         if self.feature8.isChecked():
             if len(self.list_corr_features) == 0:
                 self.list_corr_features = attr_data[features_list[8]]
             else:
-                self.list_corr_features = pd.concat([self.list_corr_features, attr_data[features_list[8]]],axis=1)
+                self.list_corr_features = pd.concat([self.list_corr_features, attr_data[features_list[8]]], axis=1)
 
         if self.feature9.isChecked():
             if len(self.list_corr_features) == 0:
                 self.list_corr_features = attr_data[features_list[9]]
             else:
-                self.list_corr_features = pd.concat([self.list_corr_features, attr_data[features_list[9]]],axis=1)
+                self.list_corr_features = pd.concat([self.list_corr_features, attr_data[features_list[9]]], axis=1)
 
         if self.feature10.isChecked():
             if len(self.list_corr_features) == 0:
@@ -3030,6 +2963,65 @@ class KNNClassifier(QMainWindow):
             else:
                 self.list_corr_features = pd.concat([self.list_corr_features, attr_data[features_list[19]]], axis=1)
 
+        if self.feature20.isChecked():
+            if len(self.list_corr_features) == 0:
+                self.list_corr_features = attr_data[features_list[20]]
+            else:
+                self.list_corr_features = pd.concat([self.list_corr_features, attr_data[features_list[20]]], axis=1)
+
+        if self.feature21.isChecked():
+            if len(self.list_corr_features) == 0:
+                self.list_corr_features = attr_data[features_list[21]]
+            else:
+                self.list_corr_features = pd.concat([self.list_corr_features, attr_data[features_list[21]]], axis=1)
+
+        if self.feature22.isChecked():
+            if len(self.list_corr_features) == 0:
+                self.list_corr_features = attr_data[features_list[22]]
+            else:
+                self.list_corr_features = pd.concat([self.list_corr_features, attr_data[features_list[22]]], axis=1)
+
+        if self.feature23.isChecked():
+            if len(self.list_corr_features) == 0:
+                self.list_corr_features = attr_data[features_list[23]]
+            else:
+                self.list_corr_features = pd.concat([self.list_corr_features, attr_data[features_list[23]]], axis=1)
+
+        if self.feature24.isChecked():
+            if len(self.list_corr_features) == 0:
+                self.list_corr_features = attr_data[features_list[24]]
+            else:
+                self.list_corr_features = pd.concat([self.list_corr_features, attr_data[features_list[24]]], axis=1)
+
+        if self.feature25.isChecked():
+            if len(self.list_corr_features) == 0:
+                self.list_corr_features = attr_data[features_list[25]]
+            else:
+                self.list_corr_features = pd.concat([self.list_corr_features, attr_data[features_list[25]]], axis=1)
+
+        if self.feature26.isChecked():
+            if len(self.list_corr_features) == 0:
+                self.list_corr_features = attr_data[features_list[26]]
+            else:
+                self.list_corr_features = pd.concat([self.list_corr_features, attr_data[features_list[26]]], axis=1)
+
+        if self.feature27.isChecked():
+            if len(self.list_corr_features) == 0:
+                self.list_corr_features = attr_data[features_list[27]]
+            else:
+                self.list_corr_features = pd.concat([self.list_corr_features, attr_data[features_list[27]]], axis=1)
+
+        if self.feature28.isChecked():
+            if len(self.list_corr_features) == 0:
+                self.list_corr_features = attr_data[features_list[28]]
+            else:
+                self.list_corr_features = pd.concat([self.list_corr_features, attr_data[features_list[28]]], axis=1)
+
+        if self.feature29.isChecked():
+            if len(self.list_corr_features) == 0:
+                self.list_corr_features = attr_data[features_list[29]]
+            else:
+                self.list_corr_features = pd.concat([self.list_corr_features, attr_data[features_list[29]]], axis=1)
 
         try:
             vtest_per = float(self.txtPercentTest.text())
@@ -3053,8 +3045,6 @@ class KNNClassifier(QMainWindow):
             neighbour_input=9
             self.txtNeighbourCount.setText(str(neighbour_input))
 
-        # Clear the graphs to populate them with the new information
-
         self.ax1.clear()
         self.ax2.clear()
         self.ax3.clear()
@@ -3064,19 +3054,15 @@ class KNNClassifier(QMainWindow):
 
         vtest_per = vtest_per / 100
 
-        # Assign the X and y to run the Random Forest Classifier
-
         X_dt =  self.list_corr_features
-        #temp_X_dt=X_dt.copy()
         y_dt = attr_data[target_variable]
         X_columns=X_dt.columns.tolist()
         labelencoder_columns= list(set(X_columns) & set(label_encoder_variables))
         one_hot_encoder_columns=list(set(X_columns) & set(hot_encoder_variables))
-        #print(labelencoder_columns)
-        #print(one_hot_encoder_columns)
+
         class_le = LabelEncoder()
         class_ohe=OneHotEncoder()
-        #X_dt[labelencoder_columns] = class_le.fit_transform(X_dt[labelencoder_columns])
+
         temp = X_columns.copy()
         for ohe_val in one_hot_encoder_columns:
             temp.remove(ohe_val)
@@ -3084,18 +3070,12 @@ class KNNClassifier(QMainWindow):
         for le_val in labelencoder_columns:
             temp_X_dt[le_val] = class_le.fit_transform(temp_X_dt[le_val])
         X_dt=pd.concat((temp_X_dt,pd.get_dummies(X_dt[one_hot_encoder_columns])),1)
-        # fit and transform the class
 
         y_dt = class_le.fit_transform(y_dt)
 
-        # split the dataset into train and test
-
         X_train, X_test, y_train, y_test = train_test_split(X_dt, y_dt, test_size=vtest_per, random_state=500)
 
-        # perform training with entropy.
-        # Decision tree with entropy
-
-        #specify random forest classifier
+        # specify knn classifier
         self.clf_knn = KNeighborsClassifier(n_neighbors=neighbour_input)
 
         # perform training
@@ -3103,10 +3083,9 @@ class KNNClassifier(QMainWindow):
 
         #-----------------------------------------------------------------------
 
-        # predicton on test using all features
+        # prediction on test using all features
         y_pred = self.clf_knn.predict(X_test)
         y_pred_score = self.clf_knn.predict_proba(X_test)
-
 
         # confusion matrix for RandomForest
         conf_matrix = confusion_matrix(y_test, y_pred)
@@ -3137,7 +3116,7 @@ class KNNClassifier(QMainWindow):
         self.txtCurrentF1score.setText(str(self.ff_f1_score))
 
         #::------------------------------------
-        ##  Ghaph1 :
+        ##  Graph1 :
         ##  Confusion Matrix
         #::------------------------------------
         class_names1 = ['','No', 'Yes']
@@ -3155,15 +3134,13 @@ class KNNClassifier(QMainWindow):
         self.fig.tight_layout()
         self.fig.canvas.draw_idle()
 
-        ## End Graph1 -- Confusion Matrix
-
         #::----------------------------------------
-        ## Graph 2 - ROC Curve
+        ## Graph 2 - Accuracy vs K Values
         #::----------------------------------------
 
         accuracy_test = []
         accuracy_train = []
-        # Might take some time
+
         for i in range(1, 20,2):
             self.knn_graph = KNeighborsClassifier(n_neighbors=i)
             self.knn_graph.fit(X_train, y_train)
@@ -3184,25 +3161,20 @@ class KNNClassifier(QMainWindow):
 
         self.fig2.tight_layout()
         self.fig2.canvas.draw_idle()
-        ######################################
-        # Graph - 3 Feature Importances
-        #####################################
-        # get feature importances
+
+        #::----------------------------------------
+        ## Graph 3 - Cross Validation Score
+        #::----------------------------------------
 
         scores_arr = []
-        #feature_arr = []
+
         for val in (X_train.columns):
-            #print(val)
             cvs_X = X_train[val].values.reshape(-1, 1)
-            #print(cvs_X)
             scores = cross_val_score(self.clf_knn, cvs_X, y_train, cv=10)
             scores_arr.append(scores.mean())
 
-        #importances = self.clf_knn.feature_importances_
-
-        # convert the importances into one-dimensional 1darray with corresponding df column names as axis labels
         f_importances = pd.Series(scores_arr, X_train.columns)
-        # sort the array in descending order of the importances
+
         f_importances.sort_values(ascending=False, inplace=True)
         f_importances=f_importances[0:20]
         X_Features = f_importances.index
@@ -3211,7 +3183,6 @@ class KNNClassifier(QMainWindow):
         min_value = f_importances.min()
         self.ax3.barh(X_Features, y_Importance)
         self.ax3.set_xlim(min_value - (min_value * 0.05), max_value + (max_value * 0.05))
-        #self.ax3.set_aspect('auto')
 
         # show the plot
         self.fig3.tight_layout()
@@ -3220,24 +3191,17 @@ class KNNClassifier(QMainWindow):
         #::-----------------------------------------------------
         # Graph 4 - ROC Curve by Class
         #::-----------------------------------------------------
-        # y_test_bin = label_binarize(y_test, classes=[0, 1])
-        # print(pd.get_dummies(y_test))
-        # print(pd.get_dummies(y_test).to_numpy())
+
         y_test_bin = pd.get_dummies(y_test).to_numpy()
         n_classes = y_test_bin.shape[1]
 
-        # From the sckict learn site
-        # https://scikit-learn.org/stable/auto_examples/model_selection/plot_roc.html
         fpr = dict()
         tpr = dict()
         roc_auc = dict()
         for i in range(n_classes):
             fpr[i], tpr[i], _ = roc_curve(y_test_bin[:, i], y_pred_score[:, i])
             roc_auc[i] = auc(fpr[i], tpr[i])
-        # print(pd.get_dummies(y_test).to_numpy().ravel())
 
-        # print("\n\n********************************\n\n")
-        # print(y_pred_score.ravel())
         # Compute micro-average ROC curve and ROC area
         fpr["micro"], tpr["micro"], _ = roc_curve(y_test_bin.ravel(), y_pred_score.ravel())
 
@@ -3261,10 +3225,6 @@ class KNNClassifier(QMainWindow):
         self.fig4.tight_layout()
         self.fig4.canvas.draw_idle()
 
-        #::-----------------------------
-        # End of graph 4  - ROC curve by class
-        #::-----------------------------
-
         #::-----------------------------------------------------
         # Other Models Comparison
         #::-----------------------------------------------------
@@ -3287,16 +3247,9 @@ class KNNClassifier(QMainWindow):
         self.accuracy_lr = accuracy_score(y_test, y_pred_lr) * 100
         self.txtAccuracy_lr.setText(str(self.accuracy_lr))
 
-    #::-----------------------------
-        # End of Other Models Comparison
-        #::-----------------------------
-
 
 class PlotCanvas(FigureCanvas):
-    #::----------------------------------------------------------
-    # creates a figure on the canvas
-    # later on this element will be used to draw a histogram graph
-    #::----------------------------------------------------------
+
     def __init__(self, parent=None, width=5, height=4, dpi=100):
         fig = Figure(figsize=(width, height), dpi=dpi)
 
@@ -3311,10 +3264,9 @@ class PlotCanvas(FigureCanvas):
     def plot(self):
         self.ax = self.figure.add_subplot(111)
 
+
 class CanvasWindow(QMainWindow):
-    #::----------------------------------
-    # Creates a canvaas containing the plot for the initial analysis
-    #;;----------------------------------
+
     def __init__(self, parent=None):
         super(CanvasWindow, self).__init__(parent)
 
@@ -3335,10 +3287,8 @@ class CanvasWindow(QMainWindow):
         self.m = PlotCanvas(self, width=5, height=4)
         self.m.move(0, 30)
 
+
 class App(QMainWindow):
-    #::-------------------------------------------------------
-    # This class creates all the elements of the application
-    #::-------------------------------------------------------
 
     def __init__(self):
         super().__init__()
@@ -3388,9 +3338,9 @@ class App(QMainWindow):
         #::----------------------------------------
         # EDA analysis
         # Creates the actions for the EDA Analysis item
-        # Initial Assesment : Histogram about the level of happiness in 2017
-        # Happiness Final : Presents the correlation between the index of happiness and a feature from the datasets.
-        # Correlation Plot : Correlation plot using all the dims in the datasets
+        # Variable Distribution : Distribution of Continuous Variables
+        # Variable Relation : Shows the relation between continuous - continuous variables (scatter plot) and categorical - continuous variables (box plot)
+        # Attrition Relation : Compares the variables on the basis of Attrition Yes and Attrition No
         #::----------------------------------------
 
         EDA1Button = QAction(QIcon('analysis.png'),'Variable Distribution', self)
@@ -3410,11 +3360,14 @@ class App(QMainWindow):
 
         #::--------------------------------------------------
         # ML Models for prediction
-        # There are two models
+        # There are four models
         #       Decision Tree
         #       Random Forest
+        #       Logistic Regression
+        #       KNN
+
         #::--------------------------------------------------
-        # Decision Tree Model
+        # Decision Tree Classifier
         #::--------------------------------------------------
         MLModel1Button =  QAction(QIcon(), 'Decision Tree', self)
         MLModel1Button.setStatusTip('ML algorithm ')
@@ -3428,14 +3381,14 @@ class App(QMainWindow):
         MLModel2Button.triggered.connect(self.MLRF)
 
         #::--------------------------------------------------
-        # Logistic REgression Model
+        # Logistic Regression Classifier
         #::--------------------------------------------------
         MLModel3Button = QAction(QIcon(), 'Logistic Regression', self)
         MLModel3Button.setStatusTip('Logistic Regression')
         MLModel3Button.triggered.connect(self.MLLR)
 
         #::--------------------------------------------------
-        # KNN Model
+        # KNN Classifier
         #::--------------------------------------------------
         MLModel4Button = QAction(QIcon(), 'K- Nearest Neigbor', self)
         MLModel4Button.setStatusTip('K- Nearest Neigbor')
@@ -3449,69 +3402,36 @@ class App(QMainWindow):
         self.dialogs = list()
 
     def EDA1(self):
-        #::------------------------------------------------------
-        # Creates the histogram
-        # The X variable contains the happiness.score
-        # X was populated in the method data_happiness()
-        # at the start of the application
-        #::------------------------------------------------------
         dialog = VariableDistribution()
         self.dialogs.append(dialog)
         dialog.show()
 
     def EDA2(self):
-        #::---------------------------------------------------------
-        # This function creates an instance of HappinessGraphs class
-        # This class creates a graph using the features in the dataset
-        # happiness vrs the score of happiness
-        #::---------------------------------------------------------
         dialog = VariableRelation()
         self.dialogs.append(dialog)
         dialog.show()
 
     def EDA4(self):
-        #::----------------------------------------------------------
-        # This function creates an instance of the CorrelationPlot class
-        #::----------------------------------------------------------
         dialog = AttritionRelation()
         self.dialogs.append(dialog)
         dialog.show()
 
     def MLDT(self):
-        #::-----------------------------------------------------------
-        # This function creates an instance of the DecisionTree class
-        # This class presents a dashboard for a Decision Tree Algorithm
-        # using the happiness dataset
-        #::-----------------------------------------------------------
         dialog = DecisionTree()
         self.dialogs.append(dialog)
         dialog.show()
 
     def MLRF(self):
-        #::-------------------------------------------------------------
-        # This function creates an instance of the Random Forest Classifier Algorithm
-        # using the happiness dataset
-        #::-------------------------------------------------------------
         dialog = RandomForest()
         self.dialogs.append(dialog)
         dialog.show()
 
     def MLLR(self):
-        #::-----------------------------------------------------------
-        # This function creates an instance of the DecisionTree class
-        # This class presents a dashboard for a Decision Tree Algorithm
-        # using the happiness dataset
-        #::-----------------------------------------------------------
         dialog = LogisticRegressionClassifier()
         self.dialogs.append(dialog)
         dialog.show()
 
     def MLKNN(self):
-        #::-----------------------------------------------------------
-        # This function creates an instance of the DecisionTree class
-        # This class presents a dashboard for a Decision Tree Algorithm
-        # using the happiness dataset
-        #::-----------------------------------------------------------
         dialog = KNNClassifier()
         self.dialogs.append(dialog)
         dialog.show()
@@ -3530,10 +3450,9 @@ def main():
 
 def attrition_data():
     #::--------------------------------------------------
-    # Loads the dataset 2017.csv ( Index of happiness and esplanatory variables original dataset)
-    # Loads the dataset final_happiness_dataset (index of happiness
-    # and explanatory variables which are already preprocessed)
-    # Populates X,y that are used in the classes above
+    # Loads the dataset HR_Employee-Attrition.csv
+    # Specifies columns into several buckets such as continuous_features, categorical_features
+    # personal_features, organisation_features, commution_features, satisfaction_features
     #::--------------------------------------------------
     global happiness
     global attr_data
@@ -3551,15 +3470,12 @@ def attrition_data():
     global continuous_features
     global categorical_features
 
-    #happiness = pd.read_csv('2017.csv')
-    #X= happiness["Happiness.Score"]
-    #y= happiness["Country"]
     attr_data = pd.read_csv('HR-Employee-Attrition.csv')
     all_columns = attr_data.columns.tolist()
-    #print(all_columns)
+
     all_columns.remove("Attrition")
     features_list=all_columns.copy()
-    #print(features_list)
+
     target_variable="Attrition"
     class_names = ['No', 'Yes']
     label_encoder_variables =["Education","JobLevel"]
