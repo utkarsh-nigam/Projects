@@ -4,7 +4,7 @@ required_packages=["PyQt5","scipy","itertools","random","matplotlib","pandas","n
 for my_package in required_packages:
     try:
         command_string="conda install "+ my_package+ " --yes"
-        os.system(command_string)
+        #os.system(command_string)
     except:
         count=1
 
@@ -71,20 +71,12 @@ font_size_window = 'font-size:15px'
 
 class VariableDistribution(QMainWindow):
     #::---------------------------------------------------------
-    # This class crates a canvas with a plot to show the relation
-    # from each feature in the dataset with the happiness score
-    # methods
-    #    _init_
-    #   update
+    # This class creates a canvas with a plot to show the
+    # distribution of continuous features in the dataset
     #::---------------------------------------------------------
     send_fig = pyqtSignal(str)
 
     def __init__(self):
-        #::--------------------------------------------------------
-        # Crate a canvas with the layout to draw a dotplot
-        # The layout sets all the elements and manage the changes
-        # made on the canvas
-        #::--------------------------------------------------------
         super(VariableDistribution, self).__init__()
 
         self.Title = "EDA: Variable Distribution"
@@ -97,7 +89,6 @@ class VariableDistribution(QMainWindow):
         self.ax = self.fig.add_subplot(111)
         self.axes=[self.ax]
         self.canvas = FigureCanvas(self.fig)
-
 
         self.canvas.setSizePolicy(QSizePolicy.Expanding,QSizePolicy.Expanding)
 
@@ -134,17 +125,14 @@ class VariableDistribution(QMainWindow):
         self.btnCreateGraph.clicked.connect(self.update)
         self.filter_data.layout.addWidget(self.btnCreateGraph, 1, 0, 1, 4)
 
-
         self.groupBox1 = QGroupBox('Distribution')
         self.groupBox1Layout = QVBoxLayout()
         self.groupBox1.setLayout(self.groupBox1Layout)
-        #self.groupBox2.setMinimumSize(400, 50)
         self.groupBox1Layout.addWidget(self.canvas)
 
         self.groupBox2 = QGroupBox('Summary')
         self.groupBox2Layout = QVBoxLayout()
         self.groupBox2.setLayout(self.groupBox2Layout)
-        # self.groupBox2.setMinimumSize(400, 50)
         self.graph_summary = QPlainTextEdit()
         self.groupBox2Layout.addWidget(self.graph_summary)
 
@@ -155,23 +143,7 @@ class VariableDistribution(QMainWindow):
         self.layout.addWidget(QLabel("Select Features:"), 1, 0, 1, 1)
         self.layout.addWidget(self.dropdown2, 1, 1, 1, 1)
         self.layout.addWidget(self.filter_data, 0, 3, 2, 2)
-        #self.layout.addWidget(QLabel(""), 1, 2, 4, 1)
-        #self.layout.addWidget(self.filter_data, 0, 6, 2, 3)
         self.layout.addWidget(self.groupBox1, 2, 0, 5, 5)
-        #self.layout.addWidget(QLabel(""), 2, 5, 5, 1)
-        #self.layout.addWidget(self.groupBox2, 2, 6, 5, 3)
-        '''
-        self.layout = QGridLayout(self.main_widget)
-        self.layout.addWidget(QLabel("Select Feature Category:"),0,0,1,1)
-        self.layout.addWidget(self.dropdown1,0,1,1,1)
-        self.layout.addWidget(QLabel(""), 0, 2, 4, 1)
-        self.layout.addWidget(QLabel("Select Features:"),1,0,1,1)
-        self.layout.addWidget(self.dropdown2,1,1,1,1)
-        self.layout.addWidget(QLabel(""), 1, 2, 4, 1)
-        self.layout.addWidget(self.filter_data,0,6,2,3)
-        self.layout.addWidget(self.groupBox1,2,0,5,5)
-        self.layout.addWidget(QLabel(""), 2, 5, 5, 1)
-        self.layout.addWidget(self.groupBox2, 2, 6, 5, 3)'''
 
         self.setCentralWidget(self.main_widget)
         self.resize(1200, 700)
@@ -198,12 +170,6 @@ class VariableDistribution(QMainWindow):
             self.update()
 
     def update(self):
-        #::--------------------------------------------------------
-        # This method executes each time a change is made on the canvas
-        # containing the elements of the graph
-        # The purpose of the method es to draw a dot graph using the
-        # score of happiness and the feature chosen the canvas
-        #::--------------------------------------------------------
         colors=["b", "r", "g", "y", "k", "c"]
         self.ax.clear()
         cat1 = self.dropdown2.currentText()
@@ -226,20 +192,13 @@ class VariableDistribution(QMainWindow):
 
 class VariableRelation(QMainWindow):
     #::---------------------------------------------------------
-    # This class crates a canvas with a plot to show the relation
-    # from each feature in the dataset with the happiness score
-    # methods
-    #    _init_
-    #   update
+    # This class creates a canvas with a plot to show the relation
+    # between a continuous - continuous variable (scatter plot) and
+    # categorical - continuous variable (box plot)
     #::---------------------------------------------------------
     send_fig = pyqtSignal(str)
 
     def __init__(self):
-        #::--------------------------------------------------------
-        # Crate a canvas with the layout to draw a dotplot
-        # The layout sets all the elements and manage the changes
-        # made on the canvas
-        #::--------------------------------------------------------
         super(VariableRelation, self).__init__()
 
         self.Title = "EDA: Variable Relation"
@@ -253,14 +212,11 @@ class VariableRelation(QMainWindow):
         self.axes=[self.ax]
         self.canvas = FigureCanvas(self.fig)
 
-
         self.canvas.setSizePolicy(QSizePolicy.Expanding,QSizePolicy.Expanding)
 
         self.canvas.updateGeometry()
         self.featuresList1 = personal_features.copy()
         self.featuresList2 = personal_features.copy()
-
-
 
         self.filterBox1 = QGroupBox('Feature 1')
         self.filterBox1Layout = QGridLayout()
@@ -277,9 +233,6 @@ class VariableRelation(QMainWindow):
         self.filterBox1Layout.addWidget(QLabel("Select Feature:"),1,0)
         self.filterBox1Layout.addWidget(self.dropdown2,1,1)
 
-
-
-
         self.filterBox2 = QGroupBox('Feature 2')
         self.filterBox2Layout = QGridLayout()
         self.filterBox2.setLayout(self.filterBox2Layout)
@@ -293,9 +246,6 @@ class VariableRelation(QMainWindow):
         self.filterBox2Layout.addWidget(self.dropdown3,0,1)
         self.filterBox2Layout.addWidget(QLabel("Select Feature:"),1,0)
         self.filterBox2Layout.addWidget(self.dropdown4,1,1)
-
-
-
 
         self.filter_data = QWidget(self)
         self.filter_data.setWindowTitle("")
@@ -320,26 +270,14 @@ class VariableRelation(QMainWindow):
         self.filter_radio_button.toggled.connect(self.onFilterClicked)
         self.filter_data.layout.addWidget(self.filter_radio_button, 0, 3,1,1)
 
-
-        #self.btnCreateGraph = QPushButton("Create Graph")
-        #self.btnCreateGraph.clicked.connect(self.update)
-        #self.filter_data.layout.addWidget(self.btnCreateGraph, 0, 6, 1, 4)
-
-
-
-
-
-
         self.groupBox1 = QGroupBox('Feature Relation')
         self.groupBox1Layout = QVBoxLayout()
         self.groupBox1.setLayout(self.groupBox1Layout)
-        #self.groupBox2.setMinimumSize(400, 50)
         self.groupBox1Layout.addWidget(self.canvas)
 
         self.groupBox2 = QGroupBox('Summary')
         self.groupBox2Layout = QVBoxLayout()
         self.groupBox2.setLayout(self.groupBox2Layout)
-        # self.groupBox2.setMinimumSize(400, 50)
         self.graph_summary = QPlainTextEdit()
         self.groupBox2Layout.addWidget(self.graph_summary)
 
@@ -348,16 +286,12 @@ class VariableRelation(QMainWindow):
         self.layout.addWidget(self.filterBox1,0,0,2,2)
         self.layout.addWidget(QLabel(""), 0, 2, 2, 1)
         self.layout.addWidget(self.filterBox2,0,3,2,2)
-        #self.layout.addWidget(QLabel(""), 0, 5, 2, 1)
         self.layout.addWidget(self.filter_data,2,0,1,2)
         self.layout.addWidget(QLabel(""), 2, 2, 1, 1)
         self.btnCreateGraph = QPushButton("Create Graph")
         self.btnCreateGraph.clicked.connect(self.update)
         self.layout.addWidget(self.btnCreateGraph, 2, 3, 1, 2)
         self.layout.addWidget(self.groupBox1,3,0,7,5)
-        #self.layout.addWidget(QLabel(""), 2, 5, 6, 1)
-        #self.layout.addWidget(self.groupBox2, 2, 6, 6, 3)
-
 
         self.setCentralWidget(self.main_widget)
         self.resize(1200, 700)
@@ -389,7 +323,6 @@ class VariableRelation(QMainWindow):
             self.featuresList2 = list(set(continuous_features) & set(satisfaction_features))
         if (self.dropdown2.currentText() in self.featuresList2):
             self.featuresList2.remove(self.dropdown2.currentText())
-        # print(self.featuresList2)
         self.dropdown4.addItems(self.featuresList2)
 
 
@@ -418,12 +351,9 @@ class VariableRelation(QMainWindow):
             self.featuresList2 = commution_features.copy()
         elif (feature_category2 == "Satisfaction"):
             self.featuresList2 = satisfaction_features.copy()
-        #print(self.dropdown2.currentText())
-        #print(self.featuresList2)
-        #print()
+
         if(self.dropdown2.currentText() in self.featuresList2):
             self.featuresList2.remove(self.dropdown2.currentText())
-        #print(self.featuresList2)
         self.dropdown4.addItems(self.featuresList2)
         self.checkifsame()
 
@@ -435,7 +365,6 @@ class VariableRelation(QMainWindow):
             self.update()
 
     def update(self):
-
         colors=["b", "r", "g", "y", "k", "c"]
         self.ax.clear()
         if (self.set_Filter=="Yes" or self.set_Filter=="No"):
@@ -447,39 +376,9 @@ class VariableRelation(QMainWindow):
         graph_feature1 = self.dropdown2.currentText()
         graph_feature2 = self.dropdown4.currentText()
 
-        '''
-        if((graph_feature1 in categorical_features) and (graph_feature2 in categorical_features)):
-            graph_data=self.filtered_data[[graph_feature1,graph_feature2]]
-            graph_data["Employee Count"]=1
-            my_pt = pd.pivot_table(graph_data, index=[graph_feature1,graph_feature2], values=["Employee Count"], aggfunc=np.sum)
-            my_pt = pd.DataFrame(my_pt.to_records())
-            my_pt=my_pt.pivot(graph_feature1, graph_feature2, "Employee Count")
-            my_pt=my_pt.fillna(0)
-            #print(my_pt)
-            #print(my_pt.index.values)
-            #print(my_pt.columns.values)
-
-            #class_names1 = ['', 'Happy', 'Med.Happy', 'Low.Happy', 'Not.Happy']
-            class_names_x=[""]+my_pt.columns.values.tolist()
-            class_names_y = [""] + my_pt.index.values.tolist()
-            self.ax.matshow(my_pt, cmap=plt.cm.get_cmap('Blues', 14))
-            self.ax.set_yticklabels(class_names_y)
-            self.ax.set_xticklabels(class_names_x, rotation=90)
-            self.ax.set_xlabel(graph_feature2)
-            self.ax.set_ylabel(graph_feature1)
-            #self.ax.set_title("Heat Map")
-            my_np=my_pt.values
-            for i in range(len(class_names_y)-1):
-                for j in range(len(class_names_x)-1):
-                    self.ax.text(j, i, str(my_np[i][j]))
-            print(self.ax.get_xlim())
-        '''
-
         if((graph_feature1 in continuous_features) and (graph_feature2 in continuous_features)):
             x_axis_data = self.filtered_data[graph_feature1]
             y_axis_data = self.filtered_data[graph_feature2]
-            #print(x_axis_data)
-            #print(y_axis_data)
             self.ax.scatter(x_axis_data, y_axis_data)
             b, m = polyfit(x_axis_data, y_axis_data, 1)
             self.ax.plot(x_axis_data, b + m * x_axis_data, '-', color="orange")
@@ -491,30 +390,25 @@ class VariableRelation(QMainWindow):
             self.ax.grid(True)
 
         else:
-
             if(graph_feature1 in continuous_features):
-                continuous_data=graph_feature1#self.filtered_data[graph_feature1]
-                categorical_data=graph_feature2#self.filtered_data[graph_feature2]
+                continuous_data=graph_feature1
+                categorical_data=graph_feature2
             else:
-                continuous_data = graph_feature2#self.filtered_data[graph_feature2]
-                categorical_data = graph_feature1#self.filtered_data[graph_feature1]
+                continuous_data = graph_feature2
+                categorical_data = graph_feature1
             graph_data = self.filtered_data[[graph_feature1, graph_feature2]]
             my_pt = pd.pivot_table(graph_data, index=graph_data.index,columns=categorical_data, values=continuous_data,aggfunc=np.sum)
             my_pt = pd.DataFrame(my_pt.to_records())
             my_pt=my_pt.drop(columns=['index'])
-            #my_pt = my_pt.fillna("")
             class_names_x = my_pt.columns.values.tolist()
             my_np = my_pt.values
             mask = ~np.isnan(my_np)
             my_np_2 = [d[m] for d, m in zip(my_np.T, mask.T)]
             class_names_x = my_pt.columns.values.tolist()
             self.ax.boxplot(my_np_2)
-            #self.ax.axes.autoscale()
             self.ax.set_xlabel(categorical_data)
             self.ax.set_ylabel(continuous_data)
             self.ax.set_xticklabels(class_names_x)
-
-
 
         self.fig.tight_layout()
         self.fig.canvas.draw_idle()
@@ -522,7 +416,10 @@ class VariableRelation(QMainWindow):
 
 
 class AttritionRelation(QMainWindow):
-
+    #::---------------------------------------------------------
+    # This class creates a canvas with a plot to show the
+    # distribution of continuous features in the dataset
+    #::---------------------------------------------------------
     send_fig = pyqtSignal(str)
 
     def __init__(self):
@@ -3449,9 +3346,9 @@ class App(QMainWindow):
         self.top = 200
         self.width = 1000
         self.height = 500
-        self.Title = 'Predict Employee Attrition '
-        label = QLabel(self)
-        pixmap = QPixmap('EM.png')
+        self.Title = 'Employee Attrition Evaluator & Predictor '
+        label = QLabel(self, alignment=Qt.AlignCenter)
+        pixmap = QPixmap('Background Image.png')
         label.setPixmap(pixmap)
         self.setCentralWidget(label)
         self.resize(pixmap.width(), pixmap.height())
