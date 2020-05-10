@@ -1,13 +1,14 @@
 import sys,os
+#os.chdir("/Users/utkarshvirendranigam/Desktop/Homework/Project")
 required_packages=["PyQt5","scipy","itertools","random","matplotlib","pandas","numpy","sklearn","graphviz","pydotplus","collections","warnings","seaborn"]
-
+'''
 for my_package in required_packages:
     try:
         command_string="conda install "+ my_package+ " --yes"
         os.system(command_string)
     except:
         count=1
-
+'''
 from PyQt5.QtWidgets import (QMainWindow, QApplication, QWidget, QPushButton, QAction, QComboBox, QLabel,
                              QGridLayout, QCheckBox, QGroupBox, QVBoxLayout, QHBoxLayout, QLineEdit, QPlainTextEdit)
 
@@ -16,7 +17,7 @@ from PyQt5.QtCore import pyqtSlot
 from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtCore import Qt
 
-from itertools import cycle
+from itertools import cycle, combinations
 import random
 from PyQt5.QtWidgets import QDialog, QVBoxLayout, QSizePolicy, QFormLayout, QRadioButton, QScrollArea, QMessageBox
 from PyQt5.QtGui import QPixmap
@@ -48,7 +49,7 @@ from sklearn.preprocessing import label_binarize
 from pydotplus import graph_from_dot_data
 import collections
 #from sklearn.tree import export_graphviz
-
+#import webbrowser
 
 import warnings
 warnings.filterwarnings("ignore")
@@ -1408,9 +1409,94 @@ class DecisionTree(QMainWindow):
 
         self.layout = QGridLayout(self.main_widget)
 
-        self.groupBox1 = QGroupBox('Decision Tree Features')
+        self.groupBox1 = QGroupBox("Decision Trees Features")
         self.groupBox1Layout= QGridLayout()   # Grid
         self.groupBox1.setLayout(self.groupBox1Layout)
+        self.feature_list_box=QGroupBox(self)
+        self.feature_list_boxLayout = QGridLayout()  # Grid
+        self.feature_list_box.adjustSize()
+        self.feature_list_box.setLayout(self.feature_list_boxLayout)
+        self.feature_list_area = QScrollArea()
+
+        '''
+        self.txtPercentTest1 = QLineEdit(self)
+        self.txtPercentTest1.setText("20")
+        self.txtPercentTest2 = QLineEdit(self)
+        self.txtPercentTest2.setText("20")
+        self.txtPercentTest3 = QLineEdit(self)
+        self.txtPercentTest3.setText("20")
+        self.txtPercentTest4 = QLineEdit(self)
+        self.txtPercentTest4.setText("20")
+        self.txtPercentTest5 = QLineEdit(self)
+        self.txtPercentTest5.setText("20")
+        self.txtPercentTest6 = QLineEdit(self)
+        self.txtPercentTest6.setText("20")
+        self.txtPercentTest7 = QLineEdit(self)
+        self.txtPercentTest7.setText("20")
+        self.txtPercentTest8 = QLineEdit(self)
+        self.txtPercentTest8.setText("20")
+        self.txtPercentTest9 = QLineEdit(self)
+        self.txtPercentTest9.setText("20")
+        self.txtPercentTest10 = QLineEdit(self)
+        self.txtPercentTest10.setText("20")
+        self.txtPercentTest11 = QLineEdit(self)
+        self.txtPercentTest11.setText("20")
+        self.txtPercentTest12 = QLineEdit(self)
+        self.txtPercentTest12.setText("20")
+        self.txtPercentTest13 = QLineEdit(self)
+        self.txtPercentTest13.setText("20")
+        self.txtPercentTest14 = QLineEdit(self)
+        self.txtPercentTest14.setText("20")
+        self.txtPercentTest15 = QLineEdit(self)
+        self.txtPercentTest15.setText("20")
+        self.txtPercentTest16 = QLineEdit(self)
+        self.txtPercentTest16.setText("20")
+        self.txtPercentTest17 = QLineEdit(self)
+        self.txtPercentTest17.setText("20")
+        self.txtPercentTest18 = QLineEdit(self)
+        self.txtPercentTest18.setText("20")
+        self.txtPercentTest19 = QLineEdit(self)
+        self.txtPercentTest19.setText("20")
+        self.txtPercentTest20 = QLineEdit(self)
+        self.txtPercentTest20.setText("20")
+        self.txtPercentTest21 = QLineEdit(self)
+        self.txtPercentTest21.setText("20")
+        self.txtPercentTest22 = QLineEdit(self)
+        self.txtPercentTest22.setText("20")
+
+        self.feature_list_boxLayout.addWidget(self.txtPercentTest1,0,0)
+        self.feature_list_boxLayout.addWidget(self.txtPercentTest21, 0, 1)
+        self.feature_list_boxLayout.addWidget(self.txtPercentTest2,1,0)
+        self.feature_list_boxLayout.addWidget(self.txtPercentTest22, 1, 1)
+        self.feature_list_boxLayout.addWidget(self.txtPercentTest3,2,0)
+        self.feature_list_boxLayout.addWidget(self.txtPercentTest4,3,0)
+        self.feature_list_boxLayout.addWidget(self.txtPercentTest5,4,0)
+        self.feature_list_boxLayout.addWidget(self.txtPercentTest6,5,0)
+        self.feature_list_boxLayout.addWidget(self.txtPercentTest7,6,0)
+        self.feature_list_boxLayout.addWidget(self.txtPercentTest8,7,0)
+        self.feature_list_boxLayout.addWidget(self.txtPercentTest9,8,0)
+        self.feature_list_boxLayout.addWidget(self.txtPercentTest10,9,0)
+        self.feature_list_boxLayout.addWidget(self.txtPercentTest11,10,0)
+        self.feature_list_boxLayout.addWidget(self.txtPercentTest12,11,0)
+        self.feature_list_boxLayout.addWidget(self.txtPercentTest13,12,0)
+        self.feature_list_boxLayout.addWidget(self.txtPercentTest14,13,0)
+        self.feature_list_boxLayout.addWidget(self.txtPercentTest15,14,0)
+        self.feature_list_boxLayout.addWidget(self.txtPercentTest16,15,0)
+        self.feature_list_boxLayout.addWidget(self.txtPercentTest17,16,0)
+        self.feature_list_boxLayout.addWidget(self.txtPercentTest18,17,0)
+        self.feature_list_boxLayout.addWidget(self.txtPercentTest19,18,0)
+        self.feature_list_boxLayout.addWidget(self.txtPercentTest20,19,0)
+        '''
+
+
+        #self.feature_list_area.setWidget(self.feature_list_box)
+
+        #self.groupBoxfeatures = QGroupBox('Features')
+        #self.groupBoxfeaturesLayout = QVBoxLayout()
+        #self.groupBoxfeatures.setLayout(self.groupBoxfeaturesLayout)
+        #self.groupBoxfeaturesLayout.addWidget(self.feature_list_area)
+
+
 
         # We create a checkbox of each Features
         self.feature0 = QCheckBox(features_list[0],self)
@@ -1483,39 +1569,78 @@ class DecisionTree(QMainWindow):
         self.btnExecute = QPushButton("Run Model")
         self.btnExecute.clicked.connect(self.update)
 
-        self.groupBox1Layout.addWidget(self.feature0,0,0,1,1)
-        self.groupBox1Layout.addWidget(self.feature1,0,1,1,1)
-        self.groupBox1Layout.addWidget(self.feature2,1,0,1,1)
-        self.groupBox1Layout.addWidget(self.feature3,1,1,1,1)
-        self.groupBox1Layout.addWidget(self.feature4,2,0,1,1)
-        self.groupBox1Layout.addWidget(self.feature5,2,1,1,1)
-        self.groupBox1Layout.addWidget(self.feature6,3,0,1,1)
-        self.groupBox1Layout.addWidget(self.feature7,3,1,1,1)
-        self.groupBox1Layout.addWidget(self.feature8, 4, 0,1,1)
-        self.groupBox1Layout.addWidget(self.feature9, 4, 1,1,1)
-        self.groupBox1Layout.addWidget(self.feature10, 5, 0,1,1)
-        self.groupBox1Layout.addWidget(self.feature11, 5, 1,1,1)
-        self.groupBox1Layout.addWidget(self.feature12, 6, 0,1,1)
-        self.groupBox1Layout.addWidget(self.feature13, 6, 1,1,1)
-        self.groupBox1Layout.addWidget(self.feature14, 7, 0,1,1)
-        self.groupBox1Layout.addWidget(self.feature15, 7, 1,1,1)
-        self.groupBox1Layout.addWidget(self.feature16, 8, 0,1,1)
-        self.groupBox1Layout.addWidget(self.feature17, 8, 1,1,1)
-        self.groupBox1Layout.addWidget(self.feature18, 9, 0,1,1)
-        self.groupBox1Layout.addWidget(self.feature19, 9, 1,1,1)
-        self.groupBox1Layout.addWidget(self.feature20, 10, 0,1,1)
-        self.groupBox1Layout.addWidget(self.feature21, 10, 1,1,1)
-        self.groupBox1Layout.addWidget(self.feature22, 11, 0,1,1)
-        self.groupBox1Layout.addWidget(self.feature23, 11, 1,1,1)
-        self.groupBox1Layout.addWidget(self.feature24, 12, 0,1,1)
-        self.groupBox1Layout.addWidget(self.feature25, 12, 1,1,1)
-        self.groupBox1Layout.addWidget(self.feature26, 13, 0,1,1)
-        self.groupBox1Layout.addWidget(self.feature27, 13, 1,1,1)
-        self.groupBox1Layout.addWidget(self.feature28, 14, 0,1,1)
-        self.groupBox1Layout.addWidget(self.feature29, 14, 1,1,1)
+        #self.groupBox1Layout.addWidget(self.feature_list_area, 0, 0, 2, 2)
+        #self.groupBox1Layout.addWidget(self.feature0, 0, 0, 1, 1)
+        #self.groupBox1Layout.addWidget(self.feature1, 0, 1, 1, 1)
+        #self.groupBox1Layout.addWidget(self.feature2, 1, 0, 1, 1)
+        #self.groupBox1Layout.addWidget(self.feature3, 1, 1, 1, 1)
+        '''
+        self.groupBox1Layout.addWidget(self.feature4, 2, 0, 1, 1)
+        self.groupBox1Layout.addWidget(self.feature5, 2, 1, 1, 1)
+        self.groupBox1Layout.addWidget(self.feature6, 3, 0, 1, 1)
+        self.groupBox1Layout.addWidget(self.feature7, 3, 1, 1, 1)
+        self.groupBox1Layout.addWidget(self.feature8, 4, 0, 1, 1)
+        self.groupBox1Layout.addWidget(self.feature9, 4, 1, 1, 1)
+        self.groupBox1Layout.addWidget(self.feature10, 5, 0, 1, 1)
+        self.groupBox1Layout.addWidget(self.feature11, 5, 1, 1, 1)
+        self.groupBox1Layout.addWidget(self.feature12, 6, 0, 1, 1)
+        self.groupBox1Layout.addWidget(self.feature13, 6, 1, 1, 1)
+        self.groupBox1Layout.addWidget(self.feature14, 7, 0, 1, 1)
+        self.groupBox1Layout.addWidget(self.feature15, 7, 1, 1, 1)
+        self.groupBox1Layout.addWidget(self.feature16, 8, 0, 1, 1)
+        self.groupBox1Layout.addWidget(self.feature17, 8, 1, 1, 1)
+        self.groupBox1Layout.addWidget(self.feature18, 9, 0, 1, 1)
+        self.groupBox1Layout.addWidget(self.feature19, 9, 1, 1, 1)
+        self.groupBox1Layout.addWidget(self.feature20, 10, 0, 1, 1)
+        self.groupBox1Layout.addWidget(self.feature21, 10, 1, 1, 1)
+        self.groupBox1Layout.addWidget(self.feature22, 11, 0, 1, 1)
+        self.groupBox1Layout.addWidget(self.feature23, 11, 1, 1, 1)
+        self.groupBox1Layout.addWidget(self.feature24, 12, 0, 1, 1)
+        self.groupBox1Layout.addWidget(self.feature25, 12, 1, 1, 1)
+        self.groupBox1Layout.addWidget(self.feature26, 13, 0, 1, 1)
+        self.groupBox1Layout.addWidget(self.feature27, 13, 1, 1, 1)
+        self.groupBox1Layout.addWidget(self.feature28, 14, 0, 1, 1)
+        self.groupBox1Layout.addWidget(self.feature29, 14, 1, 1, 1)
+        '''
+
+
+
+        self.feature_list_boxLayout.addWidget(self.feature0,0,0,1,1)
+        self.feature_list_boxLayout.addWidget(self.feature1,0,1,1,1)
+        self.feature_list_boxLayout.addWidget(self.feature2,1,0,1,1)
+        self.feature_list_boxLayout.addWidget(self.feature3,1,1,1,1)
+        self.feature_list_boxLayout.addWidget(self.feature4,2,0,1,1)
+        self.feature_list_boxLayout.addWidget(self.feature5,2,1,1,1)
+        self.feature_list_boxLayout.addWidget(self.feature6,3,0,1,1)
+        self.feature_list_boxLayout.addWidget(self.feature7,3,1,1,1)
+        self.feature_list_boxLayout.addWidget(self.feature8, 4, 0,1,1)
+        self.feature_list_boxLayout.addWidget(self.feature9, 4, 1,1,1)
+        self.feature_list_boxLayout.addWidget(self.feature10, 5, 0,1,1)
+        self.feature_list_boxLayout.addWidget(self.feature11, 5, 1,1,1)
+        self.feature_list_boxLayout.addWidget(self.feature12, 6, 0,1,1)
+        self.feature_list_boxLayout.addWidget(self.feature13, 6, 1,1,1)
+        self.feature_list_boxLayout.addWidget(self.feature14, 7, 0,1,1)
+        self.feature_list_boxLayout.addWidget(self.feature15, 7, 1,1,1)
+        self.feature_list_boxLayout.addWidget(self.feature16, 8, 0,1,1)
+        self.feature_list_boxLayout.addWidget(self.feature17, 8, 1,1,1)
+        self.feature_list_boxLayout.addWidget(self.feature18, 9, 0,1,1)
+        self.feature_list_boxLayout.addWidget(self.feature19, 9, 1,1,1)
+        self.feature_list_boxLayout.addWidget(self.feature20, 10, 0,1,1)
+        self.feature_list_boxLayout.addWidget(self.feature21, 10, 1,1,1)
+        self.feature_list_boxLayout.addWidget(self.feature22, 11, 0,1,1)
+        self.feature_list_boxLayout.addWidget(self.feature23, 11, 1,1,1)
+        self.feature_list_boxLayout.addWidget(self.feature24, 12, 0,1,1)
+        self.feature_list_boxLayout.addWidget(self.feature25, 12, 1,1,1)
+        self.feature_list_boxLayout.addWidget(self.feature26, 13, 0,1,1)
+        self.feature_list_boxLayout.addWidget(self.feature27, 13, 1,1,1)
+        self.feature_list_boxLayout.addWidget(self.feature28, 14, 0,1,1)
+        self.feature_list_boxLayout.addWidget(self.feature29, 14, 1,1,1)
+        self.feature_list_area.setWidget(self.feature_list_box)
+
+        self.groupBox1Layout.addWidget(self.feature_list_area, 0, 0, 15, 2)
         self.groupBox1Layout.addWidget(self.lblPercentTest, 15, 0,1,1)
         self.groupBox1Layout.addWidget(self.txtPercentTest, 15, 1,1,1)
-        self.groupBox1Layout.addWidget(self.btnExecute, 16, 0,1,2)
+        self.groupBox1Layout.addWidget(self.btnExecute, 16, 0,2,2)
 
         self.groupBox2 = QGroupBox('Results from the model')
         self.groupBox2Layout = QVBoxLayout()
