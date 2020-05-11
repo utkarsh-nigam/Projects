@@ -3,8 +3,8 @@ required_packages=["PyQt5","scipy","itertools","random","matplotlib","pandas","n
 
 for my_package in required_packages:
     try:
-        #command_string="conda install "+ my_package+ " --yes"
-        #os.system(command_string)
+        command_string="conda install "+ my_package+ " --yes"
+        os.system(command_string)
     except:
         count=1
 
