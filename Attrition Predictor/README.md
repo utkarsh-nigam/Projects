@@ -34,7 +34,7 @@ For better performance and as per the context, features have been labelled as:
 * Percentage for Test: Percentage of total data to be used for testing the performance of the model
 
 
-Overall application can be segmented into two major parts:
+### Overall application can be segmented into two major parts:
 
 1. **EDA Analysis**: This is essentially used to evaluate features w.r.t entire dataset, Attrition Yes and Attrition No
     1. **Variable Distribution**: Showcases the distribution of continuous features along with option to choose data filter
