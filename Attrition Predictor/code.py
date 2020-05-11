@@ -95,7 +95,7 @@ class VariableDistribution(QMainWindow):
         self.canvas.updateGeometry()
         self.featuresList=personal_features
         self.dropdown1 = QComboBox()
-        self.dropdown1.addItems(["Personal", "Organisation", "Commution"])
+        self.dropdown1.addItems(["Personal", "Organisation", "Commutation"])
         self.dropdown1.currentIndexChanged.connect(self.updateCategory)
         self.dropdown2 = QComboBox()
         self.label = QLabel("A plot:")
@@ -157,7 +157,7 @@ class VariableDistribution(QMainWindow):
             self.featuresList=list(set(continuous_features) & set(personal_features))
         elif (feature_category == "Organisation"):
             self.featuresList = list(set(continuous_features) & set(organisation_features))
-        elif (feature_category == "Commution"):
+        elif (feature_category == "Commutation"):
             self.featuresList = list(set(continuous_features) & set(commution_features))
         del feature_category
         self.dropdown2.addItems(self.featuresList)
@@ -223,7 +223,7 @@ class VariableRelation(QMainWindow):
         self.filterBox1.setLayout(self.filterBox1Layout)
 
         self.dropdown1 = QComboBox()
-        self.dropdown1.addItems(["Personal", "Organisation", "Commution", "Satisfaction"])
+        self.dropdown1.addItems(["Personal", "Organisation", "Commutation", "Satisfaction"])
         self.dropdown1.currentIndexChanged.connect(self.updateCategory1)
         self.dropdown2 = QComboBox()
         self.dropdown2.addItems(self.featuresList1)
@@ -238,7 +238,7 @@ class VariableRelation(QMainWindow):
         self.filterBox2.setLayout(self.filterBox2Layout)
 
         self.dropdown3 = QComboBox()
-        self.dropdown3.addItems(["Personal", "Organisation", "Commution", "Satisfaction"])
+        self.dropdown3.addItems(["Personal", "Organisation", "Commutation", "Satisfaction"])
         self.dropdown3.currentIndexChanged.connect(self.updateCategory2)
         self.dropdown4 = QComboBox()
         self.dropdown4.addItems(self.featuresList2)
@@ -317,7 +317,7 @@ class VariableRelation(QMainWindow):
             self.featuresList2 = list(set(continuous_features) & set(personal_features))
         elif (feature_category2 == "Organisation"):
             self.featuresList2 = list(set(continuous_features) & set(organisation_features))
-        elif (feature_category2 == "Commution"):
+        elif (feature_category2 == "Commutation"):
             self.featuresList2 = list(set(continuous_features) & set(commution_features))
         elif (feature_category2 == "Satisfaction"):
             self.featuresList2 = list(set(continuous_features) & set(satisfaction_features))
@@ -333,7 +333,7 @@ class VariableRelation(QMainWindow):
             self.featuresList1=personal_features.copy()
         elif (feature_category1 == "Organisation"):
             self.featuresList1 = organisation_features.copy()
-        elif (feature_category1 == "Commution"):
+        elif (feature_category1 == "Commutation"):
             self.featuresList1 = commution_features.copy()
         elif (feature_category1 == "Satisfaction"):
             self.featuresList1 = satisfaction_features.copy()
@@ -347,7 +347,7 @@ class VariableRelation(QMainWindow):
             self.featuresList2 = personal_features.copy()
         elif (feature_category2 == "Organisation"):
             self.featuresList2 = organisation_features.copy()
-        elif (feature_category2 == "Commution"):
+        elif (feature_category2 == "Commutation"):
             self.featuresList2 = commution_features.copy()
         elif (feature_category2 == "Satisfaction"):
             self.featuresList2 = satisfaction_features.copy()
@@ -446,7 +446,7 @@ class AttritionRelation(QMainWindow):
         self.canvas.updateGeometry()
         self.featuresList=personal_features
         self.dropdown1 = QComboBox()
-        self.dropdown1.addItems(["Personal", "Organisation", "Commution", "Satisfaction"])
+        self.dropdown1.addItems(["Personal", "Organisation", "Commutation", "Satisfaction"])
         self.dropdown1.currentIndexChanged.connect(self.updateCategory)
         self.dropdown2 = QComboBox()
         self.label = QLabel("A plot:")
@@ -487,7 +487,7 @@ class AttritionRelation(QMainWindow):
             self.featuresList=personal_features
         elif (feature_category == "Organisation"):
             self.featuresList = organisation_features
-        elif (feature_category == "Commution"):
+        elif (feature_category == "Commutation"):
             self.featuresList = commution_features
         elif (feature_category == "Satisfaction"):
             self.featuresList = satisfaction_features
