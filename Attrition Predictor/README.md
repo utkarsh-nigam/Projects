@@ -16,6 +16,10 @@ For better performance and as per the context, features have been labelled as:
 * **Continuous Features** --> Age, DistanceFromHome, DailyRate, HourlyRate, MonthlyIncome, MonthlyRate, NumCompaniesWorked, PercentSalaryHike, TotalWorkingYears, TrainingTimesLastYear, YearsAtCompany, YearsInCurrentRole, YearsSinceLastPromotion, YearsWithCurrManager
 * **Categorical Features** --> JobLevel, MaritalStatus, Department, OverTime, PerformanceRating, Gender, StockOptionLevel, WorkLifeBalance, BusinessTravel, JobSatisfaction, JobRole, RelationshipSatisfaction, Education, EducationField, EnvironmentSatisfaction, JobInvolvement
 
+Also, non-continuous variables have also been tagged as:
+* **Ordinal Variables** --> Education, JobLevel
+* **Nominal Variables** --> BusinessTravel, Department, EducationField, Gender, JobRole, MaritalStatus, OverTime, StockOptionLevel
+
 
 ## Application
 
